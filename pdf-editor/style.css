@@ -1,0 +1,23 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.controls {
+  margin: 1em;
+}
+#viewer-container {
+  position: relative;
+}
+#pdf-canvas {
+  border: 1px solid #ccc;
+}
+#highlight-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+}

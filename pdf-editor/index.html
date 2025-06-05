@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PDF 編輯器</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- PDF.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.14.305/pdf.min.js"></script>
+  <!-- pdf-lib -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+</head>
+<body>
+  <h1>PDF 編輯器</h1>
+  <div class="controls">
+    <label>載入 PDF：<input type="file" id="file-input" accept="application/pdf" /></label>
+    <label>合併 PDF：<input type="file" id="merge-input" accept="application/pdf" multiple /></label>
+    <button id="merge-btn">合併</button>
+    <button id="prev-page">上一頁</button>
+    <button id="next-page">下一頁</button>
+    <button id="download-page">下載此頁為圖片</button>
+    <button id="download-pdf">下載 PDF</button>
+    <button id="highlight-toggle">標記</button>
+  </div>
+  <div id="viewer-container">
+    <canvas id="pdf-canvas"></canvas>
+    <canvas id="highlight-canvas"></canvas>
+  </div>
+
+<script src="script.js"></script>
+</body>
+</html>
