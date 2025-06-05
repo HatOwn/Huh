@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Second Person Shooter (Web)</title>
+<style>
+  body { background: #000; color: #fff; font-family: sans-serif; text-align: center; }
+  canvas { background: #111; display: block; margin: 20px auto; }
+  #info { margin-top: 10px; }
+</style>
+</head>
+<body>
+<h1>Second Person Shooter</h1>
+<canvas id="game" width="800" height="600"></canvas>
+<div id="info">Use ←/→ to move enemy, Space to shoot, Q to quit</div>
+<script>
+const canvas = document.getElementById('game');
+const ctx = canvas.getContext('2d');
+const WIDTH = canvas.width;
+const HEIGHT = canvas.height;
+
+let enemyX = WIDTH / 2;
+let bullets = [];
+let obstacles = [];
+let playerX = WIDTH / 2;
+let score = 0;
+let lives = 3;
+let gameOver = false;
+
+function rand(min, max) { return Math.random() * (max - min) + min; }
+
+function drawText() {
+  ctx.fillStyle = 'white';
+  ctx.font = '16px sans-serif';
+  ctx.fillText(`Score: ${score}`, 10, 20);
+  ctx.fillText(`Lives: ${lives}`, WIDTH - 80, 20);
+}
+
+function drawEnemy() {
+  ctx.fillStyle = 'green';
+  ctx.fillRect(enemyX - 20, HEIGHT - 40, 40, 20);
+}
+
+function drawPlayer() {
+  ctx.fillStyle = 'cyan';
+  ctx.fillRect(playerX - 20, 40, 40, 20);
+}
+
+function drawBullets() {
+  ctx.fillStyle = 'yellow';
+  bullets.forEach((b) => ctx.fillRect(b.x - 2, b.y, 4, 10));
+}
+
+function drawObstacles() {
+  ctx.fillStyle = 'red';
+  obstacles.forEach(o => ctx.fillRect(o.x - 10, o.y - 10, 20, 20));
+}
+
+function updateBullets() {
+  bullets = bullets.filter(b => b.y > 0);
+  bullets.forEach(b => {
+    b.y -= 5;
+    // hit player
+    if (b.y <= 60 && b.x >= playerX - 20 && b.x <= playerX + 20) {
+      lives -= 1;
+      b.y = -1;
+    }
+    obstacles.forEach((o, i) => {
+      if (b.x >= o.x - 10 && b.x <= o.x + 10 && b.y <= o.y + 10 && b.y >= o.y - 10) {
+        obstacles.splice(i, 1);
+        b.y = -1;
+        score += 10;
+      }
+    });
+  });
+  bullets = bullets.filter(b => b.y >= 0);
+}
+
+function updateObstacles() {
+  if (Math.random() < 0.02) {
+    obstacles.push({ x: rand(20, WIDTH - 20), y: 80 });
+  }
+  obstacles.forEach(o => {
+    o.y += 2;
+    if (o.y > HEIGHT - 40) {
+      lives -= 1;
+      o.y = HEIGHT + 10;
+    }
+  });
+  obstacles = obstacles.filter(o => o.y <= HEIGHT);
+}
+
+function updatePlayer() {
+  if (Math.random() < 0.03) {
+    playerX += rand(-20, 20);
+    playerX = Math.max(20, Math.min(WIDTH - 20, playerX));
+  }
+}
+
+function step() {
+  if (gameOver) return;
+  ctx.clearRect(0, 0, WIDTH, HEIGHT);
+  drawText();
+  drawEnemy();
+  drawPlayer();
+  drawBullets();
+  drawObstacles();
+  updateBullets();
+  updateObstacles();
+  updatePlayer();
+  if (lives <= 0) {
+    gameOver = true;
+    ctx.fillStyle = 'white';
+    ctx.font = '30px sans-serif';
+    ctx.fillText('Game Over!', WIDTH/2 - 90, HEIGHT/2);
+    ctx.fillText(`Score: ${score}`, WIDTH/2 - 70, HEIGHT/2 + 40);
+  } else {
+    requestAnimationFrame(step);
+  }
+}
+
+let keys = {};
+document.addEventListener('keydown', e => {
+  keys[e.code] = true;
+  if (e.code === 'Space' && !gameOver) {
+    bullets.push({ x: enemyX, y: HEIGHT - 50 });
+  }
+  if (e.code === 'KeyQ') {
+    gameOver = true;
+  }
+});
+document.addEventListener('keyup', e => { keys[e.code] = false; });
+
+function handleInput() {
+  if (keys['ArrowLeft']) enemyX -= 5;
+  if (keys['ArrowRight']) enemyX += 5;
+  enemyX = Math.max(20, Math.min(WIDTH - 20, enemyX));
+}
+
+function loop() {
+  handleInput();
+  step();
+}
+
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
