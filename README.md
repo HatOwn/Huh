@@ -1,8 +1,8 @@
 # Second Person Shooter
 
-This repository contains a minimal second-person shooter demo implemented in Python using the built-in `curses` library.
+This repository contains a second-person shooter demo implemented in Python using the built-in `curses` library.
 
-The game illustrates a perspective where you view yourself from the eyes of an enemy. You control the enemy at the bottom of the screen and attempt to shoot "YOU" at the top.
+You play from the enemy's perspective. The latest version adds a simple pseudo 3D corridor, obstacles moving toward you and a scoring system. You still control the enemy at the bottom while "YOU" move at the top.
 
 ## Running the game
 
@@ -23,4 +23,4 @@ Controls:
 
 For the best experience, use a terminal window with at least 80x24 characters.
 
-When a bullet reaches "YOU" at the top, the game displays a hit message and exits.
+Obstacles appear in the distance and grow larger as they approach to give a 3D effect. Shooting them yields extra points while letting them pass costs you a life. Hitting "YOU" ends the game.
