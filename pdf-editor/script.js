@@ -1,5 +1,4 @@
 let pdfDoc = null;
-let currentPage = 1;
 let scale = 1.5;
 let highlightMode = false;
 let highlights = {}; // page -> array of rects
@@ -8,15 +7,9 @@ let mergedPdfBytes = null;
 const fileInput = document.getElementById('file-input');
 const mergeInput = document.getElementById('merge-input');
 const mergeBtn = document.getElementById('merge-btn');
-const prevPageBtn = document.getElementById('prev-page');
-const nextPageBtn = document.getElementById('next-page');
-const downloadPageBtn = document.getElementById('download-page');
 const downloadPdfBtn = document.getElementById('download-pdf');
 const highlightToggle = document.getElementById('highlight-toggle');
-const pdfCanvas = document.getElementById('pdf-canvas');
-const highlightCanvas = document.getElementById('highlight-canvas');
-const ctx = pdfCanvas.getContext('2d');
-const hCtx = highlightCanvas.getContext('2d');
+const viewerContainer = document.getElementById('viewer-container');
 
 fileInput.addEventListener('change', (e) => {
   const file = e.target.files[0];
@@ -43,25 +36,6 @@ mergeBtn.addEventListener('click', async () => {
   loadPdf(mergedPdfBytes);
 });
 
-prevPageBtn.addEventListener('click', () => {
-  if (currentPage <= 1) return;
-  currentPage--;
-  renderPage();
-});
-
-nextPageBtn.addEventListener('click', () => {
-  if (currentPage >= pdfDoc.numPages) return;
-  currentPage++;
-  renderPage();
-});
-
-downloadPageBtn.addEventListener('click', () => {
-  const link = document.createElement('a');
-  link.download = `page-${currentPage}.png`;
-  link.href = pdfCanvas.toDataURL('image/png');
-  link.click();
-});
-
 downloadPdfBtn.addEventListener('click', () => {
   if (!mergedPdfBytes) return;
   const blob = new Blob([mergedPdfBytes], { type: 'application/pdf' });
@@ -73,72 +47,91 @@ downloadPdfBtn.addEventListener('click', () => {
 
 highlightToggle.addEventListener('click', () => {
   highlightMode = !highlightMode;
-  highlightCanvas.style.pointerEvents = highlightMode ? 'auto' : 'none';
+  document.querySelectorAll('.highlight-canvas').forEach((c) => {
+    c.style.pointerEvents = highlightMode ? 'auto' : 'none';
+  });
 });
-
-highlightCanvas.addEventListener('mousedown', startHighlight);
 
 async function loadPdf(data) {
   const loadingTask = pdfjsLib.getDocument({ data });
   pdfDoc = await loadingTask.promise;
-  currentPage = 1;
   highlights = {};
   mergedPdfBytes = data;
-  renderPage();
+  viewerContainer.innerHTML = '';
+
+  for (let pageNum = 1; pageNum <= pdfDoc.numPages; pageNum++) {
+    const page = await pdfDoc.getPage(pageNum);
+    const viewport = page.getViewport({ scale });
+
+    const canvas = document.createElement('canvas');
+    canvas.className = 'pdf-page';
+    canvas.width = viewport.width;
+    canvas.height = viewport.height;
+    const ctx = canvas.getContext('2d');
+    await page.render({ canvasContext: ctx, viewport }).promise;
+
+    const hlCanvas = document.createElement('canvas');
+    hlCanvas.className = 'highlight-canvas';
+    hlCanvas.width = viewport.width;
+    hlCanvas.height = viewport.height;
+    hlCanvas.dataset.pageNum = pageNum;
+    hlCanvas.style.pointerEvents = highlightMode ? "auto" : "none";
+    hlCanvas.addEventListener("mousedown", (e) => startHighlight(e, pageNum, hlCanvas));
+
+    const btn = document.createElement('button');
+    btn.textContent = '下載此頁為圖片';
+    btn.addEventListener('click', () => {
+      const link = document.createElement('a');
+      link.download = `page-${pageNum}.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    });
+
+    const pageDiv = document.createElement('div');
+    pageDiv.className = 'page-container';
+    pageDiv.appendChild(canvas);
+    pageDiv.appendChild(hlCanvas);
+    pageDiv.appendChild(btn);
+    viewerContainer.appendChild(pageDiv);
+  }
 }
 
-async function renderPage() {
-  const page = await pdfDoc.getPage(currentPage);
-  const viewport = page.getViewport({ scale });
-  pdfCanvas.width = viewport.width;
-  pdfCanvas.height = viewport.height;
-  highlightCanvas.width = viewport.width;
-  highlightCanvas.height = viewport.height;
-
-  const renderContext = {
-    canvasContext: ctx,
-    viewport: viewport
-  };
-  await page.render(renderContext).promise;
-
-  redrawHighlights();
-}
-
-function startHighlight(e) {
+function startHighlight(e, pageNum, canvas) {
   if (!highlightMode) return;
   const rect = { startX: e.offsetX, startY: e.offsetY, endX: e.offsetX, endY: e.offsetY };
+  const ctx = canvas.getContext('2d');
   const move = (ev) => {
     rect.endX = ev.offsetX;
     rect.endY = ev.offsetY;
-    redrawHighlights(rect);
+    redrawHighlights(pageNum, ctx, canvas, rect);
   };
   const up = () => {
-    highlightCanvas.removeEventListener('mousemove', move);
-    highlightCanvas.removeEventListener('mouseup', up);
-    storeHighlight(rect);
-    redrawHighlights();
+    canvas.removeEventListener('mousemove', move);
+    canvas.removeEventListener('mouseup', up);
+    storeHighlight(pageNum, rect);
+    redrawHighlights(pageNum, ctx, canvas);
   };
-  highlightCanvas.addEventListener('mousemove', move);
-  highlightCanvas.addEventListener('mouseup', up);
+  canvas.addEventListener('mousemove', move);
+  canvas.addEventListener('mouseup', up);
 }
 
-function storeHighlight(rect) {
-  if (!highlights[currentPage]) highlights[currentPage] = [];
-  highlights[currentPage].push(rect);
+function storeHighlight(pageNum, rect) {
+  if (!highlights[pageNum]) highlights[pageNum] = [];
+  highlights[pageNum].push(rect);
 }
 
-function redrawHighlights(tempRect) {
-  hCtx.clearRect(0, 0, highlightCanvas.width, highlightCanvas.height);
-  const rects = highlights[currentPage] || [];
-  rects.forEach(drawRect);
-  if (tempRect) drawRect(tempRect);
+function redrawHighlights(pageNum, ctx, canvas, tempRect) {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  const rects = highlights[pageNum] || [];
+  rects.forEach((r) => drawRect(ctx, r));
+  if (tempRect) drawRect(ctx, tempRect);
 }
 
-function drawRect(rect) {
+function drawRect(ctx, rect) {
   const x = Math.min(rect.startX, rect.endX);
   const y = Math.min(rect.startY, rect.endY);
   const w = Math.abs(rect.endX - rect.startX);
   const h = Math.abs(rect.endY - rect.startY);
-  hCtx.fillStyle = 'rgba(255,255,0,0.5)';
-  hCtx.fillRect(x, y, w, h);
+  ctx.fillStyle = 'rgba(255,255,0,0.5)';
+  ctx.fillRect(x, y, w, h);
 }
