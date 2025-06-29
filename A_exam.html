@@ -83,61 +83,86 @@
     li {
       margin-bottom: 0.8rem;
     }
+
     #sidebar {
-  position: fixed;
-  top: 80px;
-  left: 10px;
-  background-color: #263544;
-  padding: 1rem;
-  border-radius: 10px;
-  color: #fff;
-  width: 120px;
-  z-index: 1000;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-}
+      position: fixed;
+      top: 80px;
+      right: 0;
+      background-color: #263544;
+      padding: 1rem;
+      border-radius: 10px 0 0 10px;
+      color: #fff;
+      width: 140px;
+      transform: translateX(100%);
+      transition: transform 0.3s ease;
+      z-index: 1000;
+      box-shadow: -4px 0 10px rgba(0,0,0,0.2);
+    }
 
-#sidebar h3 {
-  font-size: 1rem;
-  margin-bottom: 0.5rem;
-  text-align: center;
-}
+    #sidebar.show {
+      transform: translateX(0);
+    }
 
-#sidebar ul {
-  list-style: none;
-  padding-left: 0;
-  text-align: center;
-}
+    #sidebar h3 {
+      font-size: 1rem;
+      margin-bottom: 0.5rem;
+      text-align: center;
+    }
 
-#sidebar li {
-  margin: 0.2rem 0;
-}
+    #sidebar ul {
+      list-style: none;
+      padding-left: 0;
+      text-align: center;
+    }
 
-#sidebar button {
-  background-color: #2196f3;
-  border: none;
-  color: white;
-  border-radius: 6px;
-  padding: 5px 8px;
-  font-size: 0.9rem;
-  cursor: pointer;
-  width: 100%;
-  transition: background-color 0.3s ease;
-}
+    #sidebar li {
+      margin: 0.3rem 0;
+    }
 
-#sidebar button:hover {
-  background-color: #1565c0;
-}
+    #sidebar button {
+      background-color: #2196f3;
+      border: none;
+      color: white;
+      border-radius: 6px;
+      padding: 5px 8px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      width: 100%;
+      transition: background-color 0.3s ease;
+    }
+
+    #sidebar button:hover {
+      background-color: #1565c0;
+    }
+
+    #toggleSidebar {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background-color: #2196f3;
+      color: white;
+      border: none;
+      border-radius: 50px;
+      padding: 10px 15px;
+      font-size: 1rem;
+      cursor: pointer;
+      z-index: 1100;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    }
   </style>
 </head>
 <body>
   <h1>Vocabulary Cloze Quiz</h1>
   <div id="highScoreDisplay" class="result"></div>
-    <div id="sidebar">
+  <button id="toggleSidebar">☰ 題目</button>
+  <div id="sidebar">
     <h3>Jump to</h3>
     <ul id="navList"></ul>
-    </div>
+  </div>
+
   <form id="quizForm"></form>
   <div class="result" id="result"></div>
+
   <script>
   const questions = [
     {q: "The king decided to ___ the throne and live a quiet life in the countryside.", a: "B", o: ["A. abbreviate", "B. abdicate", "C. abolish", "D. abduct"]},
@@ -195,17 +220,15 @@
     const form = document.getElementById("quizForm");
     const resultDiv = document.getElementById("result");
     const highScoreDiv = document.getElementById("highScoreDisplay");
+    const navList = document.getElementById("navList");
 
-    // 顯示最高分（初次載入）
     const storedHighScore = parseInt(localStorage.getItem("highScore")) || 0;
     highScoreDiv.textContent = `Highest Score: ${storedHighScore} / ${questions.length}`;
 
-    // 題目產生
     questions.forEach((item, index) => {
       const container = document.createElement("div");
       container.className = "quiz-item";
       container.id = `q${index}`;
-      
       container.innerHTML = `
         <div class="question">${index + 1}. ${item.q}</div>
         <div class="options">
@@ -213,16 +236,16 @@
         </div>
       `;
       form.appendChild(container);
-      // 左側跳題按鈕
-    const navList = document.getElementById("navList");
-    const navItem = document.createElement("li");
-    const jumpBtn = document.createElement("button");
-    jumpBtn.textContent = index + 1;
-    jumpBtn.onclick = () => {
-      document.getElementById(`q${index}`).scrollIntoView({ behavior: 'smooth' });
-    };
-    navItem.appendChild(jumpBtn);
-    navList.appendChild(navItem);
+
+      const navItem = document.createElement("li");
+      const jumpBtn = document.createElement("button");
+      jumpBtn.textContent = index + 1;
+      jumpBtn.onclick = (e) => {
+        e.preventDefault();
+        document.getElementById(`q${index}`).scrollIntoView({ behavior: 'smooth' });
+      };
+      navItem.appendChild(jumpBtn);
+      navList.appendChild(navItem);
     });
 
     const button = document.createElement("button");
@@ -231,7 +254,6 @@
     button.textContent = "Submit";
     form.appendChild(button);
 
-   
     form.addEventListener("submit", function(e) {
       e.preventDefault();
 
@@ -252,14 +274,12 @@
         }
       });
 
-      // 更新最高分
       const previousHigh = parseInt(localStorage.getItem("highScore")) || 0;
       if (score > previousHigh) {
         localStorage.setItem("highScore", score);
-        highScoreDiv.textContent = `🏆 Highest Score: ${score} / ${questions.length}`;
+        highScoreDiv.textContent = `\ud83c\udfc6 Highest Score: ${score} / ${questions.length}`;
       }
 
-      // 顯示結果
       resultDiv.innerHTML = `<h3>You scored ${score} out of ${questions.length}</h3>`;
 
       if (wrongAnswers.length > 0) {
@@ -274,6 +294,10 @@
         wrongHTML += "</ul>";
         resultDiv.innerHTML += wrongHTML;
       }
+    });
+
+    document.getElementById("toggleSidebar").addEventListener("click", () => {
+      document.getElementById("sidebar").classList.toggle("show");
     });
   </script>
 </body>
