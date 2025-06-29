@@ -213,6 +213,16 @@
         </div>
       `;
       form.appendChild(container);
+      // 左側跳題按鈕
+    const navList = document.getElementById("navList");
+    const navItem = document.createElement("li");
+    const jumpBtn = document.createElement("button");
+    jumpBtn.textContent = index + 1;
+    jumpBtn.onclick = () => {
+      document.getElementById(`q${index}`).scrollIntoView({ behavior: 'smooth' });
+    };
+    navItem.appendChild(jumpBtn);
+    navList.appendChild(navItem);
     });
 
     const button = document.createElement("button");
@@ -221,18 +231,7 @@
     button.textContent = "Submit";
     form.appendChild(button);
 
-    // 🌟 建立左側跳題按鈕
-  const navList = document.getElementById("navList");
-  const li = document.createElement("li");
-  const btn = document.createElement("button");
-  btn.textContent = index + 1;
-  btn.onclick = () => {
-    document.getElementById(`q${index}`).scrollIntoView({ behavior: 'smooth' });
-  };
-  li.appendChild(btn);
-  navList.appendChild(li);
-});
-
+   
     form.addEventListener("submit", function(e) {
       e.preventDefault();
 
