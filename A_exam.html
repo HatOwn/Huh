@@ -198,7 +198,7 @@
 
     // 顯示最高分（初次載入）
     const storedHighScore = parseInt(localStorage.getItem("highScore")) || 0;
-    highScoreDiv.textContent = `🏆 Highest Score: ${storedHighScore} / ${questions.length}`;
+    highScoreDiv.textContent = `Highest Score: ${storedHighScore} / ${questions.length}`;
 
     // 題目產生
     questions.forEach((item, index) => {
