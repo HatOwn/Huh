@@ -1,0 +1,172 @@
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8"></meta>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"></meta>
+  <title>Vocabulary Cloze Quiz</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 2rem;
+      background-color: #f5f5f5;
+      color: #000;
+    }
+    h1 {
+      text-align: center;
+    }
+    .quiz-item {
+      background: white;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    .question {
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+    }
+    .options label {
+      display: block;
+      margin-bottom: 0.3rem;
+    }
+    .submit-btn {
+      display: block;
+      margin: 2rem auto;
+      padding: 0.5rem 2rem;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    .result {
+      text-align: center;
+      font-size: 1.2rem;
+      margin-top: 2rem;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>Vocabulary Cloze Quiz</h1>
+  <form id="quizForm"></form>
+  <div class="result" id="result"></div>
+  <script>
+  const questions = [
+    {q: "The king decided to ___ the throne and live a quiet life in the countryside.", a: "B", o: ["A. abbreviate", "B. abdicate", "C. abolish", "D. abduct"]},
+    {q: "She couldn't ___ the sight of cruelty to animals.", a: "B", o: ["A. abide", "B. abhor", "C. accelerate", "D. adore"]},
+    {q: "His ___ living conditions shocked the social workers.", a: "B", o: ["A. abrasive", "B. abject", "C. acute", "D. affable"]},
+    {q: "The government plans to ___ outdated laws.", a: "C", o: ["A. abdicate", "B. allude", "C. abolish", "D. amass"]},
+    {q: "The ___ people of Australia have a rich cultural heritage.", a: "B", o: ["A. abrasive", "B. aboriginal", "C. affluent", "D. altruistic"]},
+    {q: "The patient underwent an ___ after complications arose.", a: "B", o: ["A. abduction", "B. abortion", "C. accretion", "D. assertion"]},
+    {q: "His ___ comments offended many people.", a: "A", o: ["A. abusive", "B. affable", "C. ardent", "D. amiable"]},
+    {q: "New technologies help to ___ economic growth.", a: "C", o: ["A. acclaim", "B. accumulate", "C. accelerate", "D. allege"]},
+    {q: "The museum is ___ to all visitors.", a: "B", o: ["A. abrasive", "B. accessible", "C. affluent", "D. acidic"]},
+    {q: "The film received great public ___.", a: "B", o: ["A. allocation", "B. acclaim", "C. allure", "D. affliction"]},
+    {q: "Moving from the tropics to Alaska requires time to ___.", a: "C", o: ["A. allude", "B. accost", "C. acclimate", "D. accumulate"]},
+    {q: "She received an ___ for her groundbreaking research.", a: "B", o: ["A. acumen", "B. accolade", "C. allegation", "D. affidavit"]},
+    {q: "He was found guilty as an ___ in the robbery.", a: "B", o: ["A. adversary", "B. accomplice", "C. affiliate", "D. artisan"]},
+    {q: "She was absent; ___, the meeting was postponed.", a: "A", o: ["A. accordingly", "B. alternatively", "C. adversely", "D. allegedly"]},
+    {q: "Interest will ___ on your savings over time.", a: "B", o: ["A. abstain", "B. accrue", "C. agitate", "D. abdicate"]},
+    {q: "Over the years, he managed to ___ a large collection of books.", a: "C", o: ["A. acquire", "B. alleviate", "C. accumulate", "D. afflict"]},
+    {q: "Lemon juice tastes ___.", a: "A", o: ["A. acidic", "B. acute", "C. aloof", "D. abject"]},
+    {q: "His ___ reply surprised everyone.", a: "C", o: ["A. agile", "B. abrasive", "C. abrupt", "D. adept"]},
+    {q: "He chose to ___ from voting on the issue.", a: "C", o: ["A. afflict", "B. appease", "C. abstain", "D. allege"]},
+    {q: "The monk led an ___ life, eating simple foods.", a: "B", o: ["A. affable", "B. abstemious", "C. affluent", "D. acute"]},
+    {q: "___ from alcohol can improve health.", a: "B", o: ["A. Acquisition", "B. Abstinence", "C. Affliction", "D. Abortion"]},
+    {q: "The professor’s explanation was too ___ for the students.", a: "B", o: ["A. abusive", "B. abstruse", "C. affluent", "D. altruistic"]},
+    {q: "The loud music was __ to his ears.", a: "C", o: ["A. acidic", "B. acoustic", "C. abrasive", "D. affable"]},
+    {q: "She is ___ in mathematics and solves problems quickly.", a: "A", o: ["A. adept", "B. affluent", "C. archaic", "D. articulate"]},
+    {q: "The teacher ___ the student for being late.", a: "C", o: ["A. adorned", "B. alienated", "C. admonished", "D. afflicted"]},
+    {q: "The princess wore a diamond tiara to ___ her hair.", a: "A", o: ["A. adorn", "B. allocate", "C. afflict", "D. abbreviate"]},
+    {q: "He responded to criticism with ___ skill.", a: "A", o: ["A. adroit", "B. ardent", "C. abstruse", "D. abrasive"]},
+    {q: "His ___ for the singer was evident in his praise.", a: "C", o: ["A. affliction", "B. acquisition", "C. adulation", "D. accusation"]},
+    {q: "The ___ of the computer changed the way people work.", a: "B", o: ["A. adversity", "B. advent", "C. acclaim", "D. anomaly"]},
+    {q: "His ___ made him a fierce competitor.", a: "D", o: ["A. amicability", "B. adversary", "C. adversity", "D. animosity"]},
+    {q: "After a year of ___, she finally found a stable job.", a: "A", o: ["A. adversity", "B. amnesty", "C. ardor", "D. agility"]},
+    {q: "The building has an ___ design with modern lines.", a: "B", o: ["A. archaic", "B. aesthetic", "C. affluent", "D. arable"]},
+    {q: "The lawyer submitted a sworn ___.", a: "B", o: ["A. affiliate", "B. affidavit", "C. acumen", "D. appendix"]},
+    {q: "The company is an ___ of a multinational firm.", a: "B", o: ["A. affidavit", "B. affiliate", "C. alloy", "D. altercation"]},
+    {q: "She tried to ___ the fears of the child.", a: "B", o: ["A. alienate", "B. allay", "C. allude", "D. accumulate"]},
+    {q: "Painkillers help ___ the symptoms.", a: "A", o: ["A. alleviate", "B. affiliate", "C. afflict", "D. agitate"]},
+    {q: "He was ___ to have stolen the car.", a: "A", o: ["A. alleged", "B. alleged", "C. abolished", "D. adorned"]},
+    {q: "The story was a symbolic ___.", a: "C", o: ["A. affinity", "B. allege", "C. allegory", "D. acumen"]},
+    {q: "Funds were ___ to various departments.", a: "B", o: ["A. affixed", "B. allotted", "C. afflicted", "D. alluded"]},
+    {q: "The metals were combined to form an ___.", a: "A", o: ["A. alloy", "B. affiliate", "C. aggregate", "D. amnesty"]},
+    {q: "He ___ to problems without directly stating them.", a: "B", o: ["A. allured", "B. alluded", "C. alleviated", "D. accosted"]},
+    {q: "The perfume's ___ attracted many customers.", a: "B", o: ["A. affliction", "B. allure", "C. abstinence", "D. altercation"]},
+    {q: "The bird soared ___.", a: "B", o: ["A. amply", "B. aloft", "C. agape", "D. acute"]},
+    {q: "He stood ___ from the group, uninterested in the discussion.", a: "B", o: ["A. affable", "B. aloof", "C. ardent", "D. agile"]},
+    {q: "A heated ___ broke out between the two men.", a: "B", o: ["A. acquisition", "B. altercation", "C. affidavit", "D. amnesty"]},
+    {q: "Her ___ behavior surprised those who thought her selfish.", a: "B", o: ["A. affable", "B. altruistic", "C. acidic", "D. arid"]},
+    {q: "The two companies decided to ___.", a: "C", o: ["A. amass", "B. allocate", "C. amalgamate", "D. append"]},
+    {q: "He tried to ___ enough money for retirement.", a: "C", o: ["A. append", "B. agitate", "C. amass", "D. alleviate"]},
+    {q: "Her speech was clear and ___.", a: "B", o: ["A. arbitrary", "B. articulate", "C. archaic", "D. abstract"]},
+    {q: "The clever ___ helped him escape from the trap.", a: "B", o: ["A. artifact", "B. artifice", "C. acquisition", "D. appendage"]},
+  ];
+
+  const form = document.getElementById("quizForm");
+  questions.forEach((item, index) => {
+    const container = document.createElement("div");
+    container.className = "quiz-item";
+    container.innerHTML = `
+      <div class="question">${index + 1}. ${item.q}</div>
+      <div class="options">
+        ${item.o.map((opt, i) => `<label><input type="radio" name="q${index}" value="${String.fromCharCode(65 + i)}"> ${opt}</label>`).join('')}
+      </div>
+    `;
+    form.appendChild(container);
+  });
+
+  const button = document.createElement("button");
+  button.type = "submit";
+  button.className = "submit-btn";
+  button.textContent = "Submit";
+  form.appendChild(button);
+
+  form.addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    let score = 0;
+    const wrongAnswers = []; // Array to store incorrect answers
+
+    // Check each question
+    questions.forEach((item, i) => {
+      const selectedValue = form[`q${i}`].value;
+
+      if (selectedValue === item.a) {
+        score++;
+      } else {
+        // Find the full text of the correct answer
+        const correctOptionIndex = item.a.charCodeAt(0) - 65; // Converts 'A' to 0, 'B' to 1, etc.
+        const correctOptionText = item.o[correctOptionIndex];
+
+        // Add details to the wrongAnswers array
+        wrongAnswers.push({
+          questionNumber: i + 1,
+          questionText: item.q,
+          correctAnswer: correctOptionText
+        });
+      }
+    });
+
+    const resultDiv = document.getElementById("result");
+    resultDiv.innerHTML = ""; // Clear previous results first
+
+    // Display the final score
+    resultDiv.innerHTML += `<h3>You scored ${score} out of ${questions.length}</h3>`;
+
+    // Display the list of wrong answers, if there are any
+    if (wrongAnswers.length > 0) {
+      let wrongAnswersHTML = "<h4>Review your mistakes:</h4><ul>";
+      wrongAnswers.forEach(wrong => {
+        wrongAnswersHTML += `
+          <li>
+            <strong>Q${wrong.questionNumber}:</strong> ${wrong.questionText}<br>
+            <strong>Correct Answer:</strong> ${wrong.correctAnswer}
+          </li>`;
+      });
+      wrongAnswersHTML += "</ul>";
+      resultDiv.innerHTML += wrongAnswersHTML;
+    }
+  });
+</script>
+</body>
+</html>
