@@ -90,19 +90,13 @@
       right: 10px;
       background-color: #263544;
       padding: 1rem;
-      border-radius: 10px 0 0 10px;
+      border-radius: 10px;
       color: #fff;
-      width: 140px;
-      transform: translateX(100%);
-      transition: transform 0.3s ease;
+      width: 120px;
       z-index: 1000;
-      box-shadow: -4px 0 10px rgba(0,0,0,0.2);
-      max-height: 80vh; /* 限高 */
-      overflow-y: auto; /* 捲動 */
-    }
-
-    #sidebar.show {
-      transform: translateX(0);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      max-height: 80vh;
+      overflow-y: auto;
     }
 
     #sidebar h3 {
@@ -118,7 +112,7 @@
     }
 
     #sidebar li {
-      margin: 0.3rem 0;
+      margin: 0.2rem 0;
     }
 
     #sidebar button {
@@ -137,34 +131,35 @@
       background-color: #1565c0;
     }
 
-    #toggleSidebar {
+    #homeBtn {
       position: fixed;
-      top: 20px;
-      right: 20px;
+      top: 10px;
+      left: 10px;
+      padding: 8px 14px;
       background-color: #2196f3;
       color: white;
       border: none;
-      border-radius: 50px;
-      padding: 10px 15px;
-      font-size: 1rem;
+      border-radius: 6px;
+      font-size: 0.9rem;
       cursor: pointer;
       z-index: 1100;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    }
+
+    #homeBtn:hover {
+      background-color: #1565c0;
     }
   </style>
 </head>
 <body>
+  <button id="homeBtn" onclick="location.href='index.html'">🏠 Home</button>
   <h1>Vocabulary Cloze Quiz</h1>
   <div id="highScoreDisplay" class="result"></div>
-  <button id="toggleSidebar">☰ 題目</button>
   <div id="sidebar">
     <h3>Jump to</h3>
     <ul id="navList"></ul>
   </div>
-
   <form id="quizForm"></form>
   <div class="result" id="result"></div>
-
   <script>
   const questions = [
     {q: "The king decided to ___ the throne and live a quiet life in the countryside.", a: "B", o: ["A. abbreviate", "B. abdicate", "C. abolish", "D. abduct"]},
@@ -235,8 +230,7 @@
         <div class="question">${index + 1}. ${item.q}</div>
         <div class="options">
           ${item.o.map((opt, i) => `<label><input type="radio" name="q${index}" value="${String.fromCharCode(65 + i)}"> ${opt}</label>`).join('')}
-        </div>
-      `;
+        </div>`;
       form.appendChild(container);
 
       const navItem = document.createElement("li");
@@ -279,7 +273,7 @@
       const previousHigh = parseInt(localStorage.getItem("highScore")) || 0;
       if (score > previousHigh) {
         localStorage.setItem("highScore", score);
-        highScoreDiv.textContent = `\ud83c\udfc6 Highest Score: ${score} / ${questions.length}`;
+        highScoreDiv.textContent = `🏆 Highest Score: ${score} / ${questions.length}`;
       }
 
       resultDiv.innerHTML = `<h3>You scored ${score} out of ${questions.length}</h3>`;
@@ -287,19 +281,11 @@
       if (wrongAnswers.length > 0) {
         let wrongHTML = "<h4>Review your mistakes:</h4><ul>";
         wrongAnswers.forEach(item => {
-          wrongHTML += `
-            <li>
-              <strong>Q${item.questionNumber}:</strong> ${item.questionText}<br>
-              <strong>Correct Answer:</strong> ${item.correctAnswer}
-            </li>`;
+          wrongHTML += `<li><strong>Q${item.questionNumber}:</strong> ${item.questionText}<br><strong>Correct Answer:</strong> ${item.correctAnswer}</li>`;
         });
         wrongHTML += "</ul>";
         resultDiv.innerHTML += wrongHTML;
       }
-    });
-
-    document.getElementById("toggleSidebar").addEventListener("click", () => {
-      document.getElementById("sidebar").classList.toggle("show");
     });
   </script>
 </body>
