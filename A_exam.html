@@ -2,66 +2,94 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Vocabulary Cloze Quiz</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: 'Segoe UI', sans-serif;
       margin: 2rem;
-      background-color: #f5f5f5;
-      color: #000;
+      background-color: #1e2a38;
+      color: #f0f0f0;
     }
+
     h1 {
       text-align: center;
+      font-size: 2.5rem;
+      color: #ffffff;
+      margin-bottom: 0.5rem;
     }
+
     #highScoreDisplay {
       text-align: center;
-      font-size: 1.1rem;
-      margin-bottom: 1.5rem;
-      color: #2c3e50;
+      font-size: 1.2rem;
+      margin-bottom: 2rem;
+      color: #aad0ff;
     }
+
     .quiz-item {
-      background: white;
-      padding: 1rem;
-      margin-bottom: 1rem;
-      border-radius: 8px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      background: #ffffff;
+      color: #222;
+      padding: 1rem 1.5rem;
+      margin: 1rem auto;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      max-width: 800px;
     }
+
     .question {
       font-weight: bold;
       margin-bottom: 0.5rem;
+      font-size: 1.1rem;
     }
+
     .options label {
       display: block;
-      margin-bottom: 0.3rem;
+      margin-bottom: 0.4rem;
+      cursor: pointer;
     }
+
     .submit-btn {
       display: block;
       margin: 2rem auto;
-      padding: 0.5rem 2rem;
-      font-size: 1rem;
+      padding: 0.7rem 2.5rem;
+      font-size: 1.1rem;
+      background-color: #2196f3;
+      color: white;
+      border: none;
+      border-radius: 6px;
       cursor: pointer;
+      transition: background-color 0.3s ease;
     }
+
+    .submit-btn:hover {
+      background-color: #1769aa;
+    }
+
     .result {
-      text-align: center;
-      font-size: 1.2rem;
-      margin-top: 2rem;
-      font-weight: bold;
-    }
-    ul {
-      text-align: left;
+      background-color: #ffffff;
+      color: #222;
       max-width: 800px;
-      margin: 1rem auto;
+      margin: 2rem auto;
+      padding: 1.5rem;
+      border-radius: 10px;
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+      font-size: 1.1rem;
+    }
+
+    ul {
+      padding-left: 1.2rem;
+    }
+
+    li {
+      margin-bottom: 0.8rem;
     }
   </style>
 </head>
 <body>
   <h1>Vocabulary Cloze Quiz</h1>
-  <!-- 顯示最高分 -->
   <div id="highScoreDisplay" class="result"></div>
   <form id="quizForm"></form>
   <div class="result" id="result"></div>
-
   <script>
   const questions = [
     {q: "The king decided to ___ the throne and live a quiet life in the countryside.", a: "B", o: ["A. abbreviate", "B. abdicate", "C. abolish", "D. abduct"]},
@@ -116,7 +144,7 @@
     {q: "The clever ___ helped him escape from the trap.", a: "B", o: ["A. artifact", "B. artifice", "C. acquisition", "D. appendage"]},
   ];
 
-  const form = document.getElementById("quizForm");
+    const form = document.getElementById("quizForm");
     const resultDiv = document.getElementById("result");
     const highScoreDiv = document.getElementById("highScoreDisplay");
 
@@ -124,7 +152,7 @@
     const storedHighScore = parseInt(localStorage.getItem("highScore")) || 0;
     highScoreDiv.textContent = `🏆 Highest Score: ${storedHighScore} / ${questions.length}`;
 
-    // 動態建立題目
+    // 題目產生
     questions.forEach((item, index) => {
       const container = document.createElement("div");
       container.className = "quiz-item";
@@ -137,7 +165,6 @@
       form.appendChild(container);
     });
 
-    // 建立提交按鈕
     const button = document.createElement("button");
     button.type = "submit";
     button.className = "submit-btn";
