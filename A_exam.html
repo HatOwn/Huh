@@ -1,8 +1,8 @@
-
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"></meta>
-  <meta content="width=device-width, initial-scale=1.0" name="viewport"></meta>
+  <meta charset="UTF-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
   <title>Vocabulary Cloze Quiz</title>
   <style>
     body {
@@ -13,6 +13,12 @@
     }
     h1 {
       text-align: center;
+    }
+    #highScoreDisplay {
+      text-align: center;
+      font-size: 1.1rem;
+      margin-bottom: 1.5rem;
+      color: #2c3e50;
     }
     .quiz-item {
       background: white;
@@ -42,12 +48,20 @@
       margin-top: 2rem;
       font-weight: bold;
     }
+    ul {
+      text-align: left;
+      max-width: 800px;
+      margin: 1rem auto;
+    }
   </style>
 </head>
 <body>
   <h1>Vocabulary Cloze Quiz</h1>
+  <!-- 顯示最高分 -->
+  <div id="highScoreDisplay" class="result"></div>
   <form id="quizForm"></form>
   <div class="result" id="result"></div>
+
   <script>
   const questions = [
     {q: "The king decided to ___ the throne and live a quiet life in the countryside.", a: "B", o: ["A. abbreviate", "B. abdicate", "C. abolish", "D. abduct"]},
@@ -103,70 +117,76 @@
   ];
 
   const form = document.getElementById("quizForm");
-  questions.forEach((item, index) => {
-    const container = document.createElement("div");
-    container.className = "quiz-item";
-    container.innerHTML = `
-      <div class="question">${index + 1}. ${item.q}</div>
-      <div class="options">
-        ${item.o.map((opt, i) => `<label><input type="radio" name="q${index}" value="${String.fromCharCode(65 + i)}"> ${opt}</label>`).join('')}
-      </div>
-    `;
-    form.appendChild(container);
-  });
+    const resultDiv = document.getElementById("result");
+    const highScoreDiv = document.getElementById("highScoreDisplay");
 
-  const button = document.createElement("button");
-  button.type = "submit";
-  button.className = "submit-btn";
-  button.textContent = "Submit";
-  form.appendChild(button);
+    // 顯示最高分（初次載入）
+    const storedHighScore = parseInt(localStorage.getItem("highScore")) || 0;
+    highScoreDiv.textContent = `🏆 Highest Score: ${storedHighScore} / ${questions.length}`;
 
-  form.addEventListener("submit", function(e) {
-    e.preventDefault();
-
-    let score = 0;
-    const wrongAnswers = []; // Array to store incorrect answers
-
-    // Check each question
-    questions.forEach((item, i) => {
-      const selectedValue = form[`q${i}`].value;
-
-      if (selectedValue === item.a) {
-        score++;
-      } else {
-        // Find the full text of the correct answer
-        const correctOptionIndex = item.a.charCodeAt(0) - 65; // Converts 'A' to 0, 'B' to 1, etc.
-        const correctOptionText = item.o[correctOptionIndex];
-
-        // Add details to the wrongAnswers array
-        wrongAnswers.push({
-          questionNumber: i + 1,
-          questionText: item.q,
-          correctAnswer: correctOptionText
-        });
-      }
+    // 動態建立題目
+    questions.forEach((item, index) => {
+      const container = document.createElement("div");
+      container.className = "quiz-item";
+      container.innerHTML = `
+        <div class="question">${index + 1}. ${item.q}</div>
+        <div class="options">
+          ${item.o.map((opt, i) => `<label><input type="radio" name="q${index}" value="${String.fromCharCode(65 + i)}"> ${opt}</label>`).join('')}
+        </div>
+      `;
+      form.appendChild(container);
     });
 
-    const resultDiv = document.getElementById("result");
-    resultDiv.innerHTML = ""; // Clear previous results first
+    // 建立提交按鈕
+    const button = document.createElement("button");
+    button.type = "submit";
+    button.className = "submit-btn";
+    button.textContent = "Submit";
+    form.appendChild(button);
 
-    // Display the final score
-    resultDiv.innerHTML += `<h3>You scored ${score} out of ${questions.length}</h3>`;
+    form.addEventListener("submit", function(e) {
+      e.preventDefault();
 
-    // Display the list of wrong answers, if there are any
-    if (wrongAnswers.length > 0) {
-      let wrongAnswersHTML = "<h4>Review your mistakes:</h4><ul>";
-      wrongAnswers.forEach(wrong => {
-        wrongAnswersHTML += `
-          <li>
-            <strong>Q${wrong.questionNumber}:</strong> ${wrong.questionText}<br>
-            <strong>Correct Answer:</strong> ${wrong.correctAnswer}
-          </li>`;
+      let score = 0;
+      const wrongAnswers = [];
+
+      questions.forEach((item, i) => {
+        const selected = form[`q${i}`].value;
+        if (selected === item.a) {
+          score++;
+        } else {
+          const correctIndex = item.a.charCodeAt(0) - 65;
+          wrongAnswers.push({
+            questionNumber: i + 1,
+            questionText: item.q,
+            correctAnswer: item.o[correctIndex]
+          });
+        }
       });
-      wrongAnswersHTML += "</ul>";
-      resultDiv.innerHTML += wrongAnswersHTML;
-    }
-  });
-</script>
+
+      // 更新最高分
+      const previousHigh = parseInt(localStorage.getItem("highScore")) || 0;
+      if (score > previousHigh) {
+        localStorage.setItem("highScore", score);
+        highScoreDiv.textContent = `🏆 Highest Score: ${score} / ${questions.length}`;
+      }
+
+      // 顯示結果
+      resultDiv.innerHTML = `<h3>You scored ${score} out of ${questions.length}</h3>`;
+
+      if (wrongAnswers.length > 0) {
+        let wrongHTML = "<h4>Review your mistakes:</h4><ul>";
+        wrongAnswers.forEach(item => {
+          wrongHTML += `
+            <li>
+              <strong>Q${item.questionNumber}:</strong> ${item.questionText}<br>
+              <strong>Correct Answer:</strong> ${item.correctAnswer}
+            </li>`;
+        });
+        wrongHTML += "</ul>";
+        resultDiv.innerHTML += wrongHTML;
+      }
+    });
+  </script>
 </body>
 </html>
