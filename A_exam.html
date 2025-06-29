@@ -85,19 +85,21 @@
     }
 
     #sidebar {
-  position: fixed;
-  top: 80px;
-  right: 10px; /* ← 改為右側 */
-  background-color: #263544;
-  padding: 1rem;
-  border-radius: 10px;
-  color: #fff;
-  width: 120px;
-  z-index: 1000;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-  max-height: 80vh; /* 限高 */
-  overflow-y: auto; /* 捲動 */
-}
+      position: fixed;
+      top: 80px;
+      right: 10px;
+      background-color: #263544;
+      padding: 1rem;
+      border-radius: 10px 0 0 10px;
+      color: #fff;
+      width: 140px;
+      transform: translateX(100%);
+      transition: transform 0.3s ease;
+      z-index: 1000;
+      box-shadow: -4px 0 10px rgba(0,0,0,0.2);
+      max-height: 80vh; /* 限高 */
+      overflow-y: auto; /* 捲動 */
+    }
 
     #sidebar.show {
       transform: translateX(0);
