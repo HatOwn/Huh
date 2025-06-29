@@ -83,11 +83,59 @@
     li {
       margin-bottom: 0.8rem;
     }
+    #sidebar {
+  position: fixed;
+  top: 80px;
+  left: 10px;
+  background-color: #263544;
+  padding: 1rem;
+  border-radius: 10px;
+  color: #fff;
+  width: 120px;
+  z-index: 1000;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+#sidebar h3 {
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
+#sidebar ul {
+  list-style: none;
+  padding-left: 0;
+  text-align: center;
+}
+
+#sidebar li {
+  margin: 0.2rem 0;
+}
+
+#sidebar button {
+  background-color: #2196f3;
+  border: none;
+  color: white;
+  border-radius: 6px;
+  padding: 5px 8px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  width: 100%;
+  transition: background-color 0.3s ease;
+}
+
+#sidebar button:hover {
+  background-color: #1565c0;
+}
   </style>
 </head>
 <body>
   <h1>Vocabulary Cloze Quiz</h1>
   <div id="highScoreDisplay" class="result"></div>
+    <div id="sidebar">
+    <h3>Jump to</h3>
+    <ul id="navList"></ul>
+    </div>
   <form id="quizForm"></form>
   <div class="result" id="result"></div>
   <script>
@@ -156,6 +204,8 @@
     questions.forEach((item, index) => {
       const container = document.createElement("div");
       container.className = "quiz-item";
+      container.id = `q${index}`;
+      
       container.innerHTML = `
         <div class="question">${index + 1}. ${item.q}</div>
         <div class="options">
@@ -170,6 +220,18 @@
     button.className = "submit-btn";
     button.textContent = "Submit";
     form.appendChild(button);
+
+    // 🌟 建立左側跳題按鈕
+  const navList = document.getElementById("navList");
+  const li = document.createElement("li");
+  const btn = document.createElement("button");
+  btn.textContent = index + 1;
+  btn.onclick = () => {
+    document.getElementById(`q${index}`).scrollIntoView({ behavior: 'smooth' });
+  };
+  li.appendChild(btn);
+  navList.appendChild(li);
+});
 
     form.addEventListener("submit", function(e) {
       e.preventDefault();
