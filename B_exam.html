@@ -50,7 +50,6 @@
       cursor: pointer;
     }
 
-    /* ## MODIFIED CSS RULE ## */
     .submit-btn {
       position: fixed; /* Set position to fixed */
       bottom: 20px;     /* Position 20px from the bottom */
@@ -102,8 +101,8 @@
       transition: transform 0.3s ease;
       z-index: 1000;
       box-shadow: -4px 0 10px rgba(0,0,0,0.2);
-      max-height: 80vh; /* 限高 */
-      overflow-y: auto; /* 捲動 */
+      max-height: 80vh; 
+      overflow-y: auto; 
     }
 
     #sidebar.show {
@@ -189,104 +188,112 @@
   <div class="result" id="result"></div>
 
   <script>
-  const questions = [
-{ "q": "The ship took on more ___ to improve its stability during the storm.", "a": "A", "o": ["A. ballast", "B. cargo", "C. anchor", "D. sail"] },
-  { "q": "The movie's plot was so ___ that I knew exactly how it would end.", "a": "C", "o": ["A. baroque", "B. bizarre", "C. banal", "D. bellicose"] },
-  { "q": "After years of mismanagement, the company was forced to declare ___.", "a": "C", "o": ["A. brevity", "B. bureaucracy", "C. bankruptcy", "D. bestowal"] },
-  { "q": "The palace was decorated in a highly ornate and ___ style.", "a": "D", "o": ["A. barren", "B. benign", "C. bland", "D. baroque"] },
-  { "q": "The desert was a vast, ___ landscape with little sign of life.", "a": "B", "o": ["A. bountiful", "B. barren", "C. bovine", "D. bogus"] },
-  { "q": "In his anger, he wanted to ___ the wall with his fist.", "a": "C", "o": ["A. bestow", "B. belittle", "C. bash", "D. bequeath"] },
-  { "q": "The investor was ___ on the market, expecting stock prices to fall.", "a": "C", "o": ["A. benevolent", "B. bullish", "C. bearish", "D. benign"] },
-  { "q": "The lost puppy looked ___ after wandering in the rain for hours.", "a": "B", "o": ["A. bountiful", "B. bedraggled", "C. bland", "D. blatant"] },
-  { "q": "She added sliced ___ to the salad for a touch of color and sweetness.", "a": "C", "o": ["A. boxwood", "B. brooch", "C. beet", "D. ballast"] },
-  { "q": "Her calm expression managed to ___ the turmoil she was feeling inside.", "a": "A", "o": ["A. belie", "B. bestow", "C. besiege", "D. bolster"] },
-  { "q": "It is unkind to ___ someone's efforts, even if they are not successful.", "a": "C", "o": ["A. bewilder", "B. bolster", "C. belittle", "D. bequeath"] },
-  { "q": "The general's ___ speech made the possibility of war seem inevitable.", "a": "C", "o": ["A. benevolent", "B. benign", "C. bellicose", "D. banal"] },
-  { "q": "An anonymous ___ donated a million dollars to the children's hospital.", "a": "D", "o": ["A. beneficiary", "B. bully", "C. bureaucrat", "D. benefactor"] },
-  { "q": "He was named the sole ___ of his grandmother's will.", "a": "B", "o": ["A. benefactor", "B. beneficiary", "C. banker", "D. broker"] },
-  { "q": "The ___ old king was loved by all his subjects for his kindness and generosity.", "a": "C", "o": ["A. bellicose", "B. barren", "C. benevolent", "D. bogus"] },
-  { "q": "The doctor was relieved to find that the tumor was ___, not cancerous.", "a": "A", "o": ["A. benign", "B. bizarre", "C. blatant", "D. brittle"] },
-  { "q": "In her will, she chose to ___ her entire fortune to charity.", "a": "D", "o": ["A. bolster", "B. besiege", "C. bestow", "D. bequeath"] },
-  { "q": "The army prepared to ___ the enemy's fortress.", "a": "C", "o": ["A. bestow", "B. bewilder", "C. besiege", "D. belie"] },
-  { "q": "The queen will ___ the title of 'Sir' upon the honored knight.", "a": "A", "o": ["A. bestow", "B. bristle", "C. breach", "D. bash"] },
-  { "q": "The complex maze was designed to ___ even the most clever visitors.", "a": "B", "o": ["A. bolster", "B. bewilder", "C. belittle", "D. buoy"] },
-  { "q": "The two nations signed a ___ agreement to promote trade.", "a": "B", "o": ["A. barren", "B. bilateral", "C. bountiful", "D. bogus"] },
-  { "q": "He wore a ___ costume to the party that no one could quite figure out.", "a": "D", "o": ["A. benign", "B. banal", "C. bovine", "D. bizarre"] },
-  { "q": "The criminal attempted to ___ the celebrity with old, embarrassing photos.", "a": "C", "o": ["A. bestow", "B. flatter", "C. blackmail", "D. bolster"] },
-  { "q": "A city-wide ___ left millions without power for several hours.", "a": "C", "o": ["A. buzzword", "B. brainstorming", "C. blackout", "D. bankruptcy"] },
-  { "q": "Drinking lots of water is good for your kidneys and ___.", "a": "C", "o": ["A. ballast", "B. bracket", "C. bladder", "D. brooch"] },
-  { "q": "Despite his ___, she refused to change her mind about the decision.", "a": "A", "o": ["A. blandishment", "B. blackmail", "C. breach", "D. bankruptcy"] },
-  { "q": "He showed a ___ disregard for the rules by cheating in plain sight.", "a": "C", "o": ["A. benign", "B. bland", "C. blatant", "D. brusque"] },
-  { "q": "The expert quickly identified the artwork as a ___ copy.", "a": "A", "o": ["A. bogus", "B. barren", "C. bountiful", "D. benevolent"] },
-  { "q": "He brought in new evidence to ___ his argument during the debate.", "a": "D", "o": ["A. belittle", "B. besiege", "C. bash", "D. bolster"] },
-  { "q": "This year's ___ harvest meant there was plenty of food for everyone.", "a": "B", "o": ["A. barren", "B. bountiful", "C. brittle", "D. bogus"] },
-  { "q": "The cow's large, dark eyes gave it a calm, ___ expression.", "a": "C", "o": ["A. bellicose", "B. benign", "C. bovine", "D. bearish"] },
-  { "q": "The formal garden was lined with neatly trimmed ___ hedges.", "a": "C", "o": ["A. beet", "B. ballast", "C. boxwood", "D. brooch"] },
-  { "q": "Please put the additional information inside a ___ to show it's a side note.", "a": "B", "o": ["A. breach", "B. bracket", "C. brooch", "D. buzzword"] },
-  { "q": "The team held a ___ session to come up with ideas for the new project.", "a": "D", "o": ["A. blackmail", "B. bankruptcy", "C. bureaucracy", "D. brainstorming"] },
-  { "q": "Failing to deliver the goods on time was a clear ___ of contract.", "a": "A", "o": ["A. breach", "B. blandishment", "C. benefactor", "D. brevity"] },
-  { "q": "For the sake of ___, the speaker kept his acceptance speech to under two minutes.", "a": "C", "o": ["A. bureaucracy", "B. bankruptcy", "C. brevity", "D. bellicosity"] },
-  { "q": "The cat began to ___ with fear when the large dog approached.", "a": "C", "o": ["A. bestow", "B. buoy", "C. bristle", "D. belittle"] },
-  { "q": "Old, dry leaves are very ___ and can crumble in your hand.", "a": "D", "o": ["A. bountiful", "B. benign", "C. bilateral", "D. brittle"] },
-  { "q": "She wore a beautiful antique ___ on the lapel of her coat.", "a": "B", "o": ["A. ballast", "B. brooch", "C. bracket", "D. breach"] },
-  { "q": "His ___ reply to my question made me feel like I was bothering him.", "a": "C", "o": ["A. bountiful", "B. baroque", "C. brusque", "D. benign"] },
-  { "q": "The older kids would often ___ the younger ones on the playground.", "a": "C", "o": ["A. bolster", "B. buoy", "C. bully", "D. bestow"] },
-  { "q": "The good news served to ___ their spirits after a difficult week.", "a": "C", "o": ["A. bash", "B. bully", "C. buoy", "D. bewilder"] },
-  { "q": "It took months to get the permit due to the endless ___ and paperwork.", "a": "C", "o": ["A. bankruptcy", "B. benefactor", "C. bureaucracy", "D. brevity"] },
-  { "q": "'Synergy' became a popular ___ in the corporate world during the 1990s.", "a": "A", "o": ["A. buzzword", "B. bracket", "C. brooch", "D. breach"] }
-  { "q": "The apathetic student's speech was full of ___ clichés and lacked any real passion.", "a": "B", "o": ["A. bellicose", "B. banal", "C. benign", "D. bountiful"] },
-  { "q": "Her ___ gaze and slow, deliberate movements were unsettling.", "a": "D", "o": ["A. brittle", "B. brusque", "C. bilateral", "D. bovine"] },
-  { "q": "He used flattery and ___ to win the trust of the wealthy widow.", "a": "A", "o": ["A. blandishment", "B. bankruptcy", "C. blackmail", "D. ballast"] },
-  { "q": "The old manuscript was so ___ that it crumbled at the slightest touch.", "a": "C", "o": ["A. banal", "B. bogus", "C. brittle", "D. barren"] },
-  { "q": "The sudden power ___ plunged the entire neighborhood into darkness.", "a": "D", "o": ["A. breach", "B. bracket", "C. brainstorming", "D. blackout"] },
-  { "q": "A generous ___ funded the construction of the new library wing.", "a": "A", "o": ["A. benefactor", "B. beneficiary", "C. bully", "D. bureaucrat"] },
-  { "q": "The politician's promises turned out to be ___ and were never fulfilled.", "a": "B", "o": ["A. benign", "B. bogus", "C. bountiful", "D. baroque"] },
-  { "q": "The manager's ___ manner of speaking often intimidated new employees.", "a": "A", "o": ["A. brusque", "B. benevolent", "C. bovine", "D. bizarre"] },
-  { "q": "The army's strategy was to ___ the city and cut off all supply lines.", "a": "C", "o": ["A. bequeath", "B. bolster", "C. besiege", "D. bestow"] },
-  { "q": "As the primary ___ of the insurance policy, she received a substantial sum.", "a": "B", "o": ["A. benefactor", "B. beneficiary", "C. beet", "D. ballast"] },
-  { "q": "His calm demeanor seemed to ___ the intense anger he was truly feeling.", "a": "D", "o": ["A. bash", "B. belittle", "C. besiege", "D. belie"] },
-  { "q": "You shouldn't ___ your own achievements; be proud of what you've accomplished.", "a": "A", "o": ["A. belittle", "B. bequeath", "C. bewilder", "D. buoy"] },
-  { "q": "The two countries worked to ___ their trade relationship with a new treaty.", "a": "C", "o": ["A. breach", "B. blackmail", "C. bolster", "D. bash"] },
-  { "q": "For the sake of ___, please summarize the report in one page.", "a": "B", "o": ["A. bankruptcy", "B. brevity", "C. bureaucracy", "D. blandishment"] },
-  { "q": "A single security ___ allowed the hackers to access the entire network.", "a": "D", "o": ["A. brooch", "B. bracket", "C. buzzword", "D. breach"] },
-  { "q": "The artist was known for his strange and ___ paintings of dream-like worlds.", "a": "C", "o": ["A. banal", "B. benign", "C. bizarre", "D. bearish"] },
-  { "q": "After hiking through the swamp, their clothes were muddy and ___.", "a": "A", "o": ["A. bedraggled", "B. bountiful", "C. blatant", "D. baroque"] },
-  { "q": "The country's fields were ___ after a long and devastating drought.", "a": "D", "o": ["A. bovine", "B. bountiful", "C. benign", "D. barren"] },
-  { "q": "She wore an elegant silver ___ pinned to the collar of her dress.", "a": "B", "o": ["A. ballast", "B. brooch", "C. beet", "D. bracket"] },
-  { "q": "The organization's complex ___ made it difficult to get anything done quickly.", "a": "A", "o": ["A. bureaucracy", "B. bankruptcy", "C. brevity", "D. benefactor"] },
-  { "q": "The magician's illusions were designed to ___ the audience completely.", "a": "C", "o": ["A. belittle", "B. bolster", "C. bewilder", "D. bestow"] },
-  { "q": "The new manager's leadership style was ___ and kind, which boosted team morale.", "a": "D", "o": ["A. bellicose", "B. bearish", "C. brusque", "D. benevolent"] },
-  { "q": "He tried to ___ his little brother into giving him his lunch money.", "a": "B", "o": ["A. buoy", "B. bully", "C. bestow", "D. bolster"] },
-  { "q": "Her ___ lie was obvious to everyone in the room.", "a": "A", "o": ["A. blatant", "B. benign", "C. banal", "D. bilateral"] },
-  { "q": "The diplomat's ___ tendencies made negotiations tense and difficult.", "a": "C", "o": ["A. benevolent", "B. bearish", "C. bellicose", "D. benign"] },
-  { "q": "The financial analyst gave a ___ forecast, predicting a drop in the stock market.", "a": "B", "o": ["A. bountiful", "B. bearish", "C. benign", "D. baroque"] },
-  { "q": "I will ___ my collection of rare books to the university library in my will.", "a": "D", "o": ["A. besiege", "B. belie", "C. belittle", "D. bequeath"] },
-  { "q": "A life raft is designed to ___ a person in the water until help arrives.", "a": "A", "o": ["A. buoy", "B. bash", "C. bully", "D. belie"] },
-  { "q": "The 'Internet of Things' is a popular ___ in the tech industry today.", "a": "C", "o": ["A. blackmail", "B. breach", "C. buzzword", "D. bracket"] },
-  { "q": "Let's hold a ___ meeting to generate some creative marketing strategies.", "a": "D", "o": ["A. bankruptcy", "B. bureaucracy", "C. blandishment", "D. brainstorming"] },
-  { "q": "The doctor assured him the growth was ___ and not a cause for concern.", "a": "B", "o": ["A. bellicose", "B. benign", "C. bizarre", "D. bogus"] },
-  { "q": "He was found guilty of trying to ___ a government official for secrets.", "a": "C", "o": ["A. brainstorm", "B. bolster", "C. blackmail", "D. bestow"] },
-  { "q": "The committee will ___ an award upon the most innovative scientist of the year.", "a": "A", "o": ["A. bestow", "B. besiege", "C. bewilder", "D. belie"] },
-  { "q": "The fall harvest was especially ___, with more than enough crops for the whole town.", "a": "C", "o": ["A. barren", "B. banal", "C. bountiful", "D. bearish"] },
-  { "q": "Use a ___ to group the non-essential parts of the sentence together.", "a": "B", "o": ["A. brooch", "B. bracket", "C. breach", "D. ballast"] },
-  { "q": "He was so enraged that he began to ___ his fists against the locked door.", "a": "D", "o": ["A. buoy", "B. bristle", "C. belie", "D. bash"] },
-  { "q": "The frightened dog's fur began to ___ as the stranger approached.", "a": "C", "o": ["A. bestow", "B. belie", "C. bristle", "D. buoy"] },
-  { "q": "A medical scan showed a stone forming in the patient's ___.", "a": "A", "o": ["A. bladder", "B. ballast", "C. benefactor", "D. bracket"] },
-  { "q": "The company's poor financial decisions led it to the brink of ___.", "a": "D", "o": ["A. brevity", "B. bureaucracy", "C. benefactor", "D. bankruptcy"] },
-  { "q": "The discussions led to a ___ agreement that benefited both nations involved.", "a": "A", "o": ["A. bilateral", "B. baroque", "C. bizarre", "D. banal"] },
-  { "q": "The soup had a very strong ___ flavor that some people found too earthy.", "a": "B", "o": ["A. brooch", "B. beet", "C. ballast", "D. boxwood"] },
-  { "q": "Heavy stones were used as ___ to keep the hot air balloon stable on the ground.", "a": "C", "o": ["A. bracket", "B. brooch", "C. ballast", "D. bladder"] },
-  { "q": "The garden path was edged with a low hedge of ___.", "a": "D", "o": ["A. beet", "B. ballast", "C. benefactor", "D. boxwood"] },
-  { "q": "The highly detailed and ___ architecture was popular in the 17th century.", "a": "B", "o": ["A. benign", "B. baroque", "C. banal", "D. bilateral"] }
+    // ## FIX: Combined the two separate question lists into one valid JavaScript array. ##
+    const allQuestions = [
+      { "q": "The ship took on more ___ to improve its stability during the storm.", "a": "A", "o": ["A. ballast", "B. cargo", "C. anchor", "D. sail"] },
+      { "q": "The movie's plot was so ___ that I knew exactly how it would end.", "a": "C", "o": ["A. baroque", "B. bizarre", "C. banal", "D. bellicose"] },
+      { "q": "After years of mismanagement, the company was forced to declare ___.", "a": "C", "o": ["A. brevity", "B. bureaucracy", "C. bankruptcy", "D. bestowal"] },
+      { "q": "The palace was decorated in a highly ornate and ___ style.", "a": "D", "o": ["A. barren", "B. benign", "C. bland", "D. baroque"] },
+      { "q": "The desert was a vast, ___ landscape with little sign of life.", "a": "B", "o": ["A. bountiful", "B. barren", "C. bovine", "D. bogus"] },
+      { "q": "In his anger, he wanted to ___ the wall with his fist.", "a": "C", "o": ["A. bestow", "B. belittle", "C. bash", "D. bequeath"] },
+      { "q": "The investor was ___ on the market, expecting stock prices to fall.", "a": "C", "o": ["A. benevolent", "B. bullish", "C. bearish", "D. benign"] },
+      { "q": "The lost puppy looked ___ after wandering in the rain for hours.", "a": "B", "o": ["A. bountiful", "B. bedraggled", "C. bland", "D. blatant"] },
+      { "q": "She added sliced ___ to the salad for a touch of color and sweetness.", "a": "C", "o": ["A. boxwood", "B. brooch", "C. beet", "D. ballast"] },
+      { "q": "Her calm expression managed to ___ the turmoil she was feeling inside.", "a": "A", "o": ["A. belie", "B. bestow", "C. besiege", "D. bolster"] },
+      { "q": "It is unkind to ___ someone's efforts, even if they are not successful.", "a": "C", "o": ["A. bewilder", "B. bolster", "C. belittle", "D. bequeath"] },
+      { "q": "The general's ___ speech made the possibility of war seem inevitable.", "a": "C", "o": ["A. benevolent", "B. benign", "C. bellicose", "D. banal"] },
+      { "q": "An anonymous ___ donated a million dollars to the children's hospital.", "a": "D", "o": ["A. beneficiary", "B. bully", "C. bureaucrat", "D. benefactor"] },
+      { "q": "He was named the sole ___ of his grandmother's will.", "a": "B", "o": ["A. benefactor", "B. beneficiary", "C. banker", "D. broker"] },
+      { "q": "The ___ old king was loved by all his subjects for his kindness and generosity.", "a": "C", "o": ["A. bellicose", "B. barren", "C. benevolent", "D. bogus"] },
+      { "q": "The doctor was relieved to find that the tumor was ___, not cancerous.", "a": "A", "o": ["A. benign", "B. bizarre", "C. blatant", "D. brittle"] },
+      { "q": "In her will, she chose to ___ her entire fortune to charity.", "a": "D", "o": ["A. bolster", "B. besiege", "C. bestow", "D. bequeath"] },
+      { "q": "The army prepared to ___ the enemy's fortress.", "a": "C", "o": ["A. bestow", "B. bewilder", "C. besiege", "D. belie"] },
+      { "q": "The queen will ___ the title of 'Sir' upon the honored knight.", "a": "A", "o": ["A. bestow", "B. bristle", "C. breach", "D. bash"] },
+      { "q": "The complex maze was designed to ___ even the most clever visitors.", "a": "B", "o": ["A. bolster", "B. bewilder", "C. belittle", "D. buoy"] },
+      { "q": "The two nations signed a ___ agreement to promote trade.", "a": "B", "o": ["A. barren", "B. bilateral", "C. bountiful", "D. bogus"] },
+      { "q": "He wore a ___ costume to the party that no one could quite figure out.", "a": "D", "o": ["A. benign", "B. banal", "C. bovine", "D. bizarre"] },
+      { "q": "The criminal attempted to ___ the celebrity with old, embarrassing photos.", "a": "C", "o": ["A. bestow", "B. flatter", "C. blackmail", "D. bolster"] },
+      { "q": "A city-wide ___ left millions without power for several hours.", "a": "C", "o": ["A. buzzword", "B. brainstorming", "C. blackout", "D. bankruptcy"] },
+      { "q": "Drinking lots of water is good for your kidneys and ___.", "a": "C", "o": ["A. ballast", "B. bracket", "C. bladder", "D. brooch"] },
+      { "q": "Despite his ___, she refused to change her mind about the decision.", "a": "A", "o": ["A. blandishment", "B. blackmail", "C. breach", "D. bankruptcy"] },
+      { "q": "He showed a ___ disregard for the rules by cheating in plain sight.", "a": "C", "o": ["A. benign", "B. bland", "C. blatant", "D. brusque"] },
+      { "q": "The expert quickly identified the artwork as a ___ copy.", "a": "A", "o": ["A. bogus", "B. barren", "C. bountiful", "D. benevolent"] },
+      { "q": "He brought in new evidence to ___ his argument during the debate.", "a": "D", "o": ["A. belittle", "B. besiege", "C. bash", "D. bolster"] },
+      { "q": "This year's ___ harvest meant there was plenty of food for everyone.", "a": "B", "o": ["A. barren", "B. bountiful", "C. brittle", "D. bogus"] },
+      { "q": "The cow's large, dark eyes gave it a calm, ___ expression.", "a": "C", "o": ["A. bellicose", "B. benign", "C. bovine", "D. bearish"] },
+      { "q": "The formal garden was lined with neatly trimmed ___ hedges.", "a": "C", "o": ["A. beet", "B. ballast", "C. boxwood", "D. brooch"] },
+      { "q": "Please put the additional information inside a ___ to show it's a side note.", "a": "B", "o": ["A. breach", "B. bracket", "C. brooch", "D. buzzword"] },
+      { "q": "The team held a ___ session to come up with ideas for the new project.", "a": "D", "o": ["A. blackmail", "B. bankruptcy", "C. bureaucracy", "D. brainstorming"] },
+      { "q": "Failing to deliver the goods on time was a clear ___ of contract.", "a": "A", "o": ["A. breach", "B. blandishment", "C. benefactor", "D. brevity"] },
+      { "q": "For the sake of ___, the speaker kept his acceptance speech to under two minutes.", "a": "C", "o": ["A. bureaucracy", "B. bankruptcy", "C. brevity", "D. bellicosity"] },
+      { "q": "The cat began to ___ with fear when the large dog approached.", "a": "C", "o": ["A. bestow", "B. buoy", "C. bristle", "D. belittle"] },
+      { "q": "Old, dry leaves are very ___ and can crumble in your hand.", "a": "D", "o": ["A. bountiful", "B. benign", "C. bilateral", "D. brittle"] },
+      { "q": "She wore a beautiful antique ___ on the lapel of her coat.", "a": "B", "o": ["A. ballast", "B. brooch", "C. bracket", "D. breach"] },
+      { "q": "His ___ reply to my question made me feel like I was bothering him.", "a": "C", "o": ["A. bountiful", "B. baroque", "C. brusque", "D. benign"] },
+      { "q": "The older kids would often ___ the younger ones on the playground.", "a": "C", "o": ["A. bolster", "B. buoy", "C. bully", "D. bestow"] },
+      { "q": "The good news served to ___ their spirits after a difficult week.", "a": "C", "o": ["A. bash", "B. bully", "C. buoy", "D. bewilder"] },
+      { "q": "It took months to get the permit due to the endless ___ and paperwork.", "a": "C", "o": ["A. bankruptcy", "B. benefactor", "C. bureaucracy", "D. brevity"] },
+      { "q": "'Synergy' became a popular ___ in the corporate world during the 1990s.", "a": "A", "o": ["A. buzzword", "B. bracket", "C. brooch", "D. breach"] },
+      { "q": "The apathetic student's speech was full of ___ clichés and lacked any real passion.", "a": "B", "o": ["A. bellicose", "B. banal", "C. benign", "D. bountiful"] },
+      { "q": "Her ___ gaze and slow, deliberate movements were unsettling.", "a": "D", "o": ["A. brittle", "B. brusque", "C. bilateral", "D. bovine"] },
+      { "q": "He used flattery and ___ to win the trust of the wealthy widow.", "a": "A", "o": ["A. blandishment", "B. bankruptcy", "C. blackmail", "D. ballast"] },
+      { "q": "The old manuscript was so ___ that it crumbled at the slightest touch.", "a": "C", "o": ["A. banal", "B. bogus", "C. brittle", "D. barren"] },
+      { "q": "The sudden power ___ plunged the entire neighborhood into darkness.", "a": "D", "o": ["A. breach", "B. bracket", "C. brainstorming", "D. blackout"] },
+      { "q": "A generous ___ funded the construction of the new library wing.", "a": "A", "o": ["A. benefactor", "B. beneficiary", "C. bully", "D. bureaucrat"] },
+      { "q": "The politician's promises turned out to be ___ and were never fulfilled.", "a": "B", "o": ["A. benign", "B. bogus", "C. bountiful", "D. baroque"] },
+      { "q": "The manager's ___ manner of speaking often intimidated new employees.", "a": "A", "o": ["A. brusque", "B. benevolent", "C. bovine", "D. bizarre"] },
+      { "q": "The army's strategy was to ___ the city and cut off all supply lines.", "a": "C", "o": ["A. bequeath", "B. bolster", "C. besiege", "D. bestow"] },
+      { "q": "As the primary ___ of the insurance policy, she received a substantial sum.", "a": "B", "o": ["A. benefactor", "B. beneficiary", "C. beet", "D. ballast"] },
+      { "q": "His calm demeanor seemed to ___ the intense anger he was truly feeling.", "a": "D", "o": ["A. bash", "B. belittle", "C. besiege", "D. belie"] },
+      { "q": "You shouldn't ___ your own achievements; be proud of what you've accomplished.", "a": "A", "o": ["A. belittle", "B. bequeath", "C. bewilder", "D. buoy"] },
+      { "q": "The two countries worked to ___ their trade relationship with a new treaty.", "a": "C", "o": ["A. breach", "B. blackmail", "C. bolster", "D. bash"] },
+      { "q": "For the sake of ___, please summarize the report in one page.", "a": "B", "o": ["A. bankruptcy", "B. brevity", "C. bureaucracy", "D. blandishment"] },
+      { "q": "A single security ___ allowed the hackers to access the entire network.", "a": "D", "o": ["A. brooch", "B. bracket", "C. buzzword", "D. breach"] },
+      { "q": "The artist was known for his strange and ___ paintings of dream-like worlds.", "a": "C", "o": ["A. banal", "B. benign", "C. bizarre", "D. bearish"] },
+      { "q": "After hiking through the swamp, their clothes were muddy and ___.", "a": "A", "o": ["A. bedraggled", "B. bountiful", "C. blatant", "D. baroque"] },
+      { "q": "The country's fields were ___ after a long and devastating drought.", "a": "D", "o": ["A. bovine", "B. bountiful", "C. benign", "D. barren"] },
+      { "q": "She wore an elegant silver ___ pinned to the collar of her dress.", "a": "B", "o": ["A. ballast", "B. brooch", "C. beet", "D. bracket"] },
+      { "q": "The organization's complex ___ made it difficult to get anything done quickly.", "a": "A", "o": ["A. bureaucracy", "B. bankruptcy", "C. brevity", "D. benefactor"] },
+      { "q": "The magician's illusions were designed to ___ the audience completely.", "a": "C", "o": ["A. belittle", "B. bolster", "C. bewilder", "D. bestow"] },
+      { "q": "The new manager's leadership style was ___ and kind, which boosted team morale.", "a": "D", "o": ["A. bellicose", "B. bearish", "C. brusque", "D. benevolent"] },
+      { "q": "He tried to ___ his little brother into giving him his lunch money.", "a": "B", "o": ["A. buoy", "B. bully", "C. bestow", "D. bolster"] },
+      { "q": "Her ___ lie was obvious to everyone in the room.", "a": "A", "o": ["A. blatant", "B. benign", "C. banal", "D. bilateral"] },
+      { "q": "The diplomat's ___ tendencies made negotiations tense and difficult.", "a": "C", "o": ["A. benevolent", "B. bearish", "C. bellicose", "D. benign"] },
+      { "q": "The financial analyst gave a ___ forecast, predicting a drop in the stock market.", "a": "B", "o": ["A. bountiful", "B. bearish", "C. benign", "D. baroque"] },
+      { "q": "I will ___ my collection of rare books to the university library in my will.", "a": "D", "o": ["A. besiege", "B. belie", "C. belittle", "D. bequeath"] },
+      { "q": "A life raft is designed to ___ a person in the water until help arrives.", "a": "A", "o": ["A. buoy", "B. bash", "C. bully", "D. belie"] },
+      { "q": "The 'Internet of Things' is a popular ___ in the tech industry today.", "a": "C", "o": ["A. blackmail", "B. breach", "C. buzzword", "D. bracket"] },
+      { "q": "Let's hold a ___ meeting to generate some creative marketing strategies.", "a": "D", "o": ["A. bankruptcy", "B. bureaucracy", "C. blandishment", "D. brainstorming"] },
+      { "q": "The doctor assured him the growth was ___ and not a cause for concern.", "a": "B", "o": ["A. bellicose", "B. benign", "C. bizarre", "D. bogus"] },
+      { "q": "He was found guilty of trying to ___ a government official for secrets.", "a": "C", "o": ["A. brainstorm", "B. bolster", "C. blackmail", "D. bestow"] },
+      { "q": "The committee will ___ an award upon the most innovative scientist of the year.", "a": "A", "o": ["A. bestow", "B. besiege", "C. bewilder", "D. belie"] },
+      { "q": "The fall harvest was especially ___, with more than enough crops for the whole town.", "a": "C", "o": ["A. barren", "B. banal", "C. bountiful", "D. bearish"] },
+      { "q": "Use a ___ to group the non-essential parts of the sentence together.", "a": "B", "o": ["A. brooch", "B. bracket", "C. breach", "D. ballast"] },
+      { "q": "He was so enraged that he began to ___ his fists against the locked door.", "a": "D", "o": ["A. buoy", "B. bristle", "C. belie", "D. bash"] },
+      { "q": "The frightened dog's fur began to ___ as the stranger approached.", "a": "C", "o": ["A. bestow", "B. belie", "C. bristle", "D. buoy"] },
+      { "q": "A medical scan showed a stone forming in the patient's ___.", "a": "A", "o": ["A. bladder", "B. ballast", "C. benefactor", "D. bracket"] },
+      { "q": "The company's poor financial decisions led it to the brink of ___.", "a": "D", "o": ["A. brevity", "B. bureaucracy", "C. benefactor", "D. bankruptcy"] },
+      { "q": "The discussions led to a ___ agreement that benefited both nations involved.", "a": "A", "o": ["A. bilateral", "B. baroque", "C. bizarre", "D. banal"] },
+      { "q": "The soup had a very strong ___ flavor that some people found too earthy.", "a": "B", "o": ["A. brooch", "B. beet", "C. ballast", "D. boxwood"] },
+      { "q": "Heavy stones were used as ___ to keep the hot air balloon stable on the ground.", "a": "C", "o": ["A. bracket", "B. brooch", "C. ballast", "D. bladder"] },
+      { "q": "The garden path was edged with a low hedge of ___.", "a": "D", "o": ["A. beet", "B. ballast", "C. benefactor", "D. boxwood"] },
+      { "q": "The highly detailed and ___ architecture was popular in the 17th century.", "a": "B", "o": ["A. benign", "B. baroque", "C. banal", "D. bilateral"] }
+    ];
 
-];
+    // ## FIX: Remove duplicate questions to create a cleaner, non-repetitive quiz. ##
+    const questions = Array.from(new Map(allQuestions.map(q => [q.q, q])).values());
 
     const form = document.getElementById("quizForm");
     const resultDiv = document.getElementById("result");
     const highScoreDiv = document.getElementById("highScoreDisplay");
     const navList = document.getElementById("navList");
 
-    const storedHighScore = parseInt(localStorage.getItem("highScore")) || 0;
+    let storedHighScore = parseInt(localStorage.getItem("highScore")) || 0;
+    // Ensure high score doesn't exceed the number of questions if the question list changes
+    if (storedHighScore > questions.length) {
+        storedHighScore = 0;
+        localStorage.setItem("highScore", 0);
+    }
     highScoreDiv.textContent = `Highest Score: ${storedHighScore} / ${questions.length}`;
 
     questions.forEach((item, index) => {
@@ -325,8 +332,8 @@
       const wrongAnswers = [];
 
       questions.forEach((item, i) => {
-        const selected = form[`q${i}`].value;
-        if (selected === item.a) {
+        const selected = form.querySelector(`input[name="q${i}"]:checked`);
+        if (selected && selected.value === item.a) {
           score++;
         } else {
           const correctIndex = item.a.charCodeAt(0) - 65;
@@ -341,7 +348,8 @@
       const previousHigh = parseInt(localStorage.getItem("highScore")) || 0;
       if (score > previousHigh) {
         localStorage.setItem("highScore", score);
-        highScoreDiv.textContent = `Highest Score: ${score} / ${questions.length}`;
+        // ## ENHANCEMENT: Added a trophy emoji for a new high score. ##
+        highScoreDiv.textContent = `🏆 New Highest Score: ${score} / ${questions.length}`;
       }
 
       resultDiv.innerHTML = `<h3>You scored ${score} out of ${questions.length}</h3>`;
@@ -358,6 +366,7 @@
         wrongHTML += "</ul>";
         resultDiv.innerHTML += wrongHTML;
       }
+       resultDiv.scrollIntoView({ behavior: 'smooth' });
     });
 
     document.getElementById("toggleSidebar").addEventListener("click", () => {
