@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vocabulary Cloze Quiz</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 2rem;
+      background-color: #1e2a38;
+      color: #f0f0f0;
+      /* Add padding to the bottom to prevent the submit button from overlapping the last question */
+      padding-bottom: 80px;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 2.5rem;
+      color: #ffffff;
+      margin-bottom: 0.5rem;
+    }
+
+    #highScoreDisplay {
+      text-align: center;
+      font-size: 1.2rem;
+      margin-bottom: 2rem;
+      color: #aad0ff;
+    }
+
+    .quiz-item {
+      background: #ffffff;
+      color: #222;
+      padding: 1rem 1.5rem;
+      margin: 1rem auto;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      max-width: 800px;
+    }
+
+    .question {
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+      font-size: 1.1rem;
+    }
+
+    .options label {
+      display: block;
+      margin-bottom: 0.4rem;
+      cursor: pointer;
+    }
+
+    /* ## MODIFIED CSS RULE ## */
+    .submit-btn {
+      position: fixed; /* Set position to fixed */
+      bottom: 20px;     /* Position 20px from the bottom */
+      left: 20px;       /* Position 20px from the left */
+      padding: 0.7rem 2.5rem;
+      font-size: 1.1rem;
+      background-color: #2196f3;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      z-index: 1100; /* Ensure it stays on top of other content */
+    }
+
+    .submit-btn:hover {
+      background-color: #1769aa;
+    }
+
+    .result {
+      background-color: #ffffff;
+      color: #222;
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 1.5rem;
+      border-radius: 10px;
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+      font-size: 1.1rem;
+    }
+
+    ul {
+      padding-left: 1.2rem;
+    }
+
+    li {
+      margin-bottom: 0.8rem;
+    }
+
+    #sidebar {
+      position: fixed;
+      top: 80px;
+      right: 10px;
+      background-color: #263544;
+      padding: 1rem;
+      border-radius: 10px 0 0 10px;
+      color: #fff;
+      width: 140px;
+      transform: translateX(100%);
+      transition: transform 0.3s ease;
+      z-index: 1000;
+      box-shadow: -4px 0 10px rgba(0,0,0,0.2);
+      max-height: 80vh; /* 限高 */
+      overflow-y: auto; /* 捲動 */
+    }
+
+    #sidebar.show {
+      transform: translateX(0);
+    }
+
+    #sidebar h3 {
+      font-size: 1rem;
+      margin-bottom: 0.5rem;
+      text-align: center;
+    }
+
+    #sidebar ul {
+      list-style: none;
+      padding-left: 0;
+      text-align: center;
+    }
+
+    #sidebar li {
+      margin: 0.3rem 0;
+    }
+
+    #sidebar button {
+      background-color: #2196f3;
+      border: none;
+      color: white;
+      border-radius: 6px;
+      padding: 5px 8px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      width: 100%;
+      transition: background-color 0.3s ease;
+    }
+
+    #sidebar button:hover {
+      background-color: #1565c0;
+    }
+
+    #toggleSidebar {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background-color: #2196f3;
+      color: white;
+      border: none;
+      border-radius: 50px;
+      padding: 10px 15px;
+      font-size: 1rem;
+      cursor: pointer;
+      z-index: 1100;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    }
+    #homeBtn {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      padding: 8px 14px;
+      background-color: #2196f3;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      z-index: 1100;
+    }
+
+    #homeBtn:hover {
+      background-color: #1565c0;
+    }
+  </style>
+</head>
+<body>
+  <button id="homeBtn" onclick="location.href='index.html'">返回主頁</button>
+  <h1>Vocabulary Cloze Quiz</h1>
+  <div id="highScoreDisplay" class="result"></div>
+  <button id="toggleSidebar">☰ 題目</button>
+  <div id="sidebar">
+    <h3>Jump to</h3>
+    <ul id="navList"></ul>
+  </div>
+
+  <form id="quizForm"></form>
+  <div class="result" id="result"></div>
+
+  <script>
+  const questions = [
+  { "q": "The celebrity was quick to ___ the new line of athletic wear.", "a": "A", "o": ["A. endorse", "B. evoke", "C. exact", "D. engender"] },
+  { "q": "The patient was given morphine to induce ___ and relieve his pain.", "a": "C", "o": ["A. eulogy", "B. ecstasy", "C. euphoria", "D. empathy"] },
+  { "q": "She gave a touching ___ at her grandmother's funeral.", "a": "B", "o": ["A. euphemism", "B. eulogy", "C. epilogue", "D. enzyme"] },
+  { "q": "The ___ argument was based on faulty logic and incorrect data.", "a": "A", "o": ["A. erroneous", "B. erotic", "C. erudite", "D. equine"] },
+  { "q": "The government passed new laws to prevent ___ on protected wilderness areas.", "a": "D", "o": ["A. equilibrium", "B. espionage", "C. ethnology", "D. encroachment"] },
+  { "q": "The lawyer's argument was ___ and difficult for the jury to follow.", "a": "B", "o": ["A. exemplary", "B. equivocal", "C. euphonious", "D. ephemeral"] },
+  { "q": "The artist tried to ___ a feeling of nostalgia through his paintings.", "a": "B", "o": ["A. embellish", "B. evoke", "C. enervate", "D. extort"] },
+  { "q": "After the initial excitement, his enthusiasm for the project began to ___.", "a": "A", "o": ["A. ebb", "B. exert", "C. endorse", "D. evoke"] },
+  { "q": "The dictator used ___ and propaganda to maintain control over the people.", "a": "D", "o": ["A. entomology", "B. etymology", "C. ecstasy", "D. espionage"] },
+  { "q": "He was an ___ person who loved parties and socializing.", "a": "A", "o": ["A. extrovert", "B. entrepreneur", "C. ecologist", "D. exile"] },
+  { "q": "He was a true ___ of the arts, with a deep knowledge of music and painting.", "a": "B", "o": ["A. entrepreneur", "B. connoisseur", "C. ecologist", "D. endorse"] },
+  { "q": "The ___ task required a great deal of concentration and effort.", "a": "B", "o": ["A. exotic", "B. exacting", "C. evergreen", "D. elusive"] },
+  { "q": "The ___ was responsible for the digestion of proteins in the stomach.", "a": "C", "o": ["A. epilogue", "B. epicenter", "C. enzyme", "D. entity"] },
+  { "q": "The study of the origins and history of words is called ___.", "a": "A", "o": ["A. etymology", "B. eulogy", "C. ethnology", "D. entomology"] },
+  { "q": "An ___ is a person who starts and runs their own business.", "a": "D", "o": ["A. extrovert", "B. exile", "C. ecologist", "D. entrepreneur"] },
+  { "q": "The speaker used a ___ to soften the harsh reality of the news.", "a": "D", "o": ["A. eulogy", "B. epilogue", "C. euphoria", "D. euphemism"] },
+  { "q": "She was so ___ after winning the race that she couldn't stop smiling.", "a": "A", "o": ["A. elated", "B. erratic", "C. elusive", "D. esoteric"] },
+  { "q": "His ___ behavior made it difficult to predict what he would do next.", "a": "C", "o": ["A. equine", "B. euphonious", "C. erratic", "D. elaborate"] },
+  { "q": "The old factory was a(n) ___ that the new owners had to deal with.", "a": "B", "o": ["A. exodus", "B. liability", "C. eulogy", "D. enzyme"] },
+  { "q": "The company had to ___ its efforts to meet the deadline.", "a": "B", "o": ["A. enervate", "B. exert", "C. evoke", "D. espouse"] },
+  { "q": "The long journey seemed to ___ the travelers, leaving them tired and weak.", "a": "C", "o": ["A. endorse", "B. engender", "C. enervate", "D. enthrall"] },
+  { "q": "The hot, humid weather can ___ feelings of lethargy and fatigue.", "a": "D", "o": ["A. endorse", "B. evoke", "C. espouse", "D. engender"] },
+  { "q": "The study of insects is a field known as ___.", "a": "B", "o": ["A. ethnology", "B. entomology", "C. etymology", "D. eulogy"] },
+  { "q": "She tried to ___ him with promises of wealth and power.", "a": "B", "o": ["A. enervate", "B. entice", "C. engender", "D. endorse"] },
+  { "q": "The prisoner made a desperate attempt to ___ his captors and escape.", "a": "C", "o": ["A. endorse", "B. enervate", "C. elude", "D. evoke"] },
+  { "q": "The soup had a deep, ___ flavor from the root vegetables.", "a": "A", "o": ["A. earthy", "B. erratic", "C. elusive", "D. esoteric"] },
+  { "q": "He was a very ___ person who was always willing to help others.", "a": "A", "o": ["A. engaging", "B. erotic", "C. erratic", "D. elusive"] },
+  { "q": "The politician tried to ___ the support of the working class.", "a": "B", "o": ["A. exert", "B. espouse", "C. enervate", "D. engender"] },
+  { "q": "The plastic was heated until it began to ___ from the machine.", "a": "A", "o": ["A. extrude", "B. extort", "C. extol", "D. evoke"] },
+  { "q": "The ___ beauty of the sunset left them speechless.", "a": "C", "o": ["A. extemporaneous", "B. extraneous", "C. exquisite", "D. exorbitant"] },
+  { "q": "The rescue team made an ___ effort to save the stranded hikers.", "a": "D", "o": ["A. erratic", "B. esoteric", "C. exemplary", "D. exhaustive"] },
+  { "q": "The novel's ___ revealed the ultimate fate of the main characters.", "a": "A", "o": ["A. epilogue", "B. enzyme", "C. eulogy", "D. epicenter"] },
+  { "q": "Her ___ speech was impressive, considering she had no time to prepare.", "a": "B", "o": ["A. exquisite", "B. extemporaneous", "C. extraneous", "D. exotic"] },
+  { "q": "The criminal tried to ___ money from the wealthy business owner.", "a": "B", "o": ["A. extol", "B. extort", "C. extrude", "D. exert"] },
+  { "q": "The comedian's ___ sense of humor was not appreciated by everyone.", "a": "A", "o": ["A. eccentric", "B. esoteric", "C. exemplary", "D. euphonious"] },
+  { "q": "The ___ was located miles away from the earthquake's most destructive waves.", "a": "A", "o": ["A. epicenter", "B. epilogue", "C. eulogy", "D. enzyme"] },
+  { "q": "The doctor recommended a gentle form of ___ for the terminally ill patient.", "a": "C", "o": ["A. euphoria", "B. eulogy", "C. euthanasia", "D. etymology"] },
+  { "q": "The ___ child was full of energy and excitement.", "a": "C", "o": ["A. emaciated", "B. esoteric", "C. exuberant", "D. equine"] },
+  { "q": "His arguments were based on ___ evidence rather than abstract theories.", "a": "D", "o": ["A. embryonic", "B. erratic", "C. ephemeral", "D. empirical"] },
+  { "q": "The company was accused of trying to ___ its financial problems.", "a": "B", "o": ["A. enervate", "B. evade", "C. evoke", "D. endorse"] },
+  { "q": "She decided to ___ on a new career as a freelance writer.", "a": "A", "o": ["A. embark", "B. embellish", "C. embezzle", "D. emanate"] },
+  { "q": "The ___ tree remained green all year long.", "a": "D", "o": ["A. ephemeral", "B. equine", "C. erratic", "D. evergreen"] },
+  { "q": "The project is still in its ___ stages and is not yet ready for public release.", "a": "A", "o": ["A. embryonic", "B. empirical", "C. esoteric", "D. exemplary"] },
+  { "q": "The museum's collection was ___ including art from many different cultures and time periods.", "a": "C", "o": ["A. eccentric", "B. elusive", "C. eclectic", "D. esoteric"] },
+  { "q": "The old book contained ___ knowledge that was only understood by a few scholars.", "a": "C", "o": ["A. exemplary", "B. engaging", "C. esoteric", "D. euphonious"] },
+  { "q": "The smell of baking bread began to ___ from the kitchen.", "a": "C", "o": ["A. embezzle", "B. embellish", "C. emanate", "D. embark"] },
+  { "q": "He tried to ___ the story with dramatic details to make it more interesting.", "a": "C", "o": ["A. embezzle", "B. embark", "C. embellish", "D. emanate"] },
+  { "q": "The ___ pain in his knee was a sign of a more serious injury.", "a": "B", "o": ["A. exemplary", "B. excruciating", "C. esoteric", "D. exotic"] },
+  { "q": "The teacher had to ___ her authority to maintain order in the classroom.", "a": "B", "o": ["A. enervate", "B. exert", "C. evoke", "D. espouse"] },
+  { "q": "The firefighter's bravery was ___, and he received a medal for his actions.", "a": "C", "o": ["A. esoteric", "B. erratic", "C. exemplary", "D. exhaustive"] },
+  { "q": "The study of human cultures and societies is called ___.", "a": "C", "o": ["A. etymology", "B. eulogy", "C. ethnology", "D. entomology"] },
+  { "q": "The ___ was sentenced to life in prison for his crimes.", "a": "A", "o": ["A. felon", "B. extrovert", "C. ecologist", "D. entrepreneur"] },
+  { "q": "The new evidence will ___ the defendant from any wrongdoing.", "a": "A", "o": ["A. exonerate", "B. exorcise", "C. extort", "D. extol"] },
+  { "q": "The long, hot summer seemed to ___ the already tense situation in the city.", "a": "B", "o": ["A. exalt", "B. exacerbate", "C. exasperate", "D. exemplify"] },
+  { "q": "The president decided to ___ the disgraced diplomat.", "a": "D", "o": ["A. extort", "B. extol", "C. exert", "D. exile"] },
+  { "q": "The book was full of ___ details that were not relevant to the main story.", "a": "A", "o": ["A. extraneous", "B. extemporaneous", "C. exquisite", "D. exotic"] },
+  { "q": "The priest was called to ___ the evil spirit from the haunted house.", "a": "C", "o": ["A. extort", "B. extol", "C. exorcise", "D. exonerate"] },
+  { "q": "The child's constant questions began to ___ his parents.", "a": "A", "o": ["A. exasperate", "B. exalt", "C. exemplify", "D. exacerbate"] },
+  { "q": "His selfish actions were a clear example of his ___.", "a": "D", "o": ["A. ecstasy", "B. eulogy", "C. euphoria", "D. egoism"] },
+  { "q": "The ___ solution was to use a temporary patch to fix the leak.", "a": "C", "o": ["A. exquisite", "B. exotic", "C. expedient", "D. exemplary"] },
+  { "q": "The accountant was caught trying to ___ funds from the company.", "a": "B", "o": ["A. embark", "B. embezzle", "C. embellish", "D. emanate"] },
+  { "q": "The professor was a(n) ___ scholar with a vast knowledge of history.", "a": "A", "o": ["A. erudite", "B. erratic", "C. esoteric", "D. equine"] },
+  { "q": "The ___ fruit had a sweet and tangy flavor.", "a": "B", "o": ["A. equine", "B. exotic", "C. esoteric", "D. erratic"] },
+  { "q": "The plan was to ___ the process by hiring more workers.", "a": "D", "o": ["A. exploit", "B. extort", "C. extol", "D. expedite"] },
+  { "q": "The ___ of the refugees from their war-torn country was a tragic sight.", "a": "C", "o": ["A. eulogy", "B. epilogue", "C. exodus", "D. enzyme"] },
+  { "q": "The crowd will ___ the hero for his brave actions.", "a": "C", "o": ["A. exert", "B. extort", "C. extol", "D. exonerate"] },
+  { "q": "Her joy was ___, lasting only for a moment before she remembered her troubles.", "a": "A", "o": ["A. ephemeral", "B. evergreen", "C. euphonious", "D. esoteric"] },
+  { "q": "He was a ___ who studied the interactions between organisms and their environment.", "a": "D", "o": ["A. extrovert", "B. entrepreneur", "C. felon", "D. ecologist"] },
+  { "q": "A feeling of ___ is the opposite of enmity.", "a": "A", "o": ["A. amity", "B. eulogy", "C. ecstasy", "D. envy"] },
+  { "q": "The government will ___ anyone who does not comply with the new law.", "a": "A", "o": ["A. expel", "B. extol", "C. exploit", "D. exert"] },
+  { "q": "The firefighter managed to ___ the family from the burning building.", "a": "A", "o": ["A. extricate", "B. extort", "C. extol", "D. extrude"] },
+  { "q": "The ___ liquid glowed in the dark.", "a": "B", "o": ["A. equine", "B. effervescent", "C. eccentric", "D. elusive"] },
+  { "q": "The company was accused of trying to ___ its workers by paying them low wages.", "a": "C", "o": ["A. extol", "B. exert", "C. exploit", "D. expel"] },
+  { "q": "The inner ear is responsible for our sense of ___.", "a": "B", "o": ["A. espionage", "B. equilibrium", "C. etymology", "D. euphoria"] },
+  { "q": "His actions ___ the values of honesty and integrity.", "a": "D", "o": ["A. exalt", "B. exasperate", "C. exacerbate", "D. exemplify"] },
+  { "q": "The ___ was long and slender, with a powerful tail.", "a": "A", "o": ["A. eel", "B. eggplant", "C. enzyme", "D. epilogue"] },
+  { "q": "The rescue of the trapped miners was hailed as a great ___.", "a": "C", "o": ["A. eulogy", "B. exploit", "C. feat", "D. evasion"] },
+  { "q": "The ___ speech was both beautiful and pleasant to listen to.", "a": "C", "o": ["A. esoteric", "B. erratic", "C. euphonious", "D. exemplary"] },
+  { "q": "The ___ nature of the problem made it difficult to solve.", "a": "D", "o": ["A. eclectic", "B. elaborate", "C. elastic", "D. elusive"] },
+  { "q": "She was an ___ student who always did her best work.", "a": "B", "o": ["A. eccentric", "B. exemplary", "C. esoteric", "D. erratic"] },
+  { "q": "The ___ band was flexible and could be stretched to twice its length.", "a": "A", "o": ["A. elastic", "B. ecstatic", "C. elusive", "D. esoteric"] },
+  { "q": "The company's ___ spending led to its eventual bankruptcy.", "a": "A", "o": ["A. extravagant", "B. extraneous", "C. exquisite", "D. extemporaneous"] },
+  { "q": "A horse is a(n) ___ animal.", "a": "A", "o": ["A. equine", "B. exotic", "C. evergreen", "D. elusive"] },
+  { "q": "After weeks of dieting, she looked thin and ___.", "a": "C", "o": ["A. elated", "B. elusive", "C. emaciated", "D. eccentric"] },
+  { "q": "The ___ of the war was long and bloody.", "a": "A", "o": ["A. aftermath", "B. eulogy", "C. epilogue", "D. exodus"] },
+  { "q": "He was a man of great ___, and his knowledge was respected by all.", "a": "B", "o": ["A. egoism", "B. erudition", "C. evasion", "D. euphoria"] },
+  { "q": "The king was known for his ___ of spirit and his generosity to the poor.", "a": "B", "o": ["A. eulogy", "B. nobility", "C. egoism", "D. enmity"] },
+  { "q": "She felt a moment of pure ___ as she watched the beautiful sunset.", "a": "C", "o": ["A. egoism", "B. enmity", "C. ecstasy", "D. eulogy"] },
+  { "q": "The citizens sought to ___ themselves from the rule of the cruel dictator.", "a": "D", "o": ["A. embellish", "B. embezzle", "C. embark", "D. emancipate"] },
+  { "q": "The ___ of the ancient king was decorated with gold and jewels.", "a": "D", "o": ["A. enzyme", "B. epilogue", "C. eulogy", "D. tomb"] },
+  { "q": "The city was a center of ___, with people from all over the world.", "a": "B", "o": ["A. eulogy", "B. commerce", "C. enmity", "D. evasion"] },
+  { "q": "The ___ plan involved several complex steps and required careful coordination.", "a": "A", "o": ["A. elaborate", "B. elastic", "C. elusive", "D. ecstatic"] },
+  { "q": "The long-standing ___ between the two families resulted in years of conflict.", "a": "A", "o": ["A. enmity", "B. entity", "C. eulogy", "D. ecstasy"] }
+];
+
+    const form = document.getElementById("quizForm");
+    const resultDiv = document.getElementById("result");
+    const highScoreDiv = document.getElementById("highScoreDisplay");
+    const navList = document.getElementById("navList");
+
+    const storedHighScore = parseInt(localStorage.getItem("highScore")) || 0;
+    highScoreDiv.textContent = `Highest Score: ${storedHighScore} / ${questions.length}`;
+
+    questions.forEach((item, index) => {
+      const container = document.createElement("div");
+      container.className = "quiz-item";
+      container.id = `q${index}`;
+      container.innerHTML = `
+        <div class="question">${index + 1}. ${item.q}</div>
+        <div class="options">
+          ${item.o.map((opt, i) => `<label><input type="radio" name="q${index}" value="${String.fromCharCode(65 + i)}"> ${opt}</label>`).join('')}
+        </div>
+      `;
+      form.appendChild(container);
+
+      const navItem = document.createElement("li");
+      const jumpBtn = document.createElement("button");
+      jumpBtn.textContent = index + 1;
+      jumpBtn.onclick = (e) => {
+        e.preventDefault();
+        document.getElementById(`q${index}`).scrollIntoView({ behavior: 'smooth' });
+      };
+      navItem.appendChild(jumpBtn);
+      navList.appendChild(navItem);
+    });
+
+    const button = document.createElement("button");
+    button.type = "submit";
+    button.className = "submit-btn";
+    button.textContent = "Submit";
+    form.appendChild(button);
+
+    form.addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      let score = 0;
+      const wrongAnswers = [];
+
+      questions.forEach((item, i) => {
+        const selected = form[`q${i}`].value;
+        if (selected === item.a) {
+          score++;
+        } else {
+          const correctIndex = item.a.charCodeAt(0) - 65;
+          wrongAnswers.push({
+            questionNumber: i + 1,
+            questionText: item.q,
+            correctAnswer: item.o[correctIndex]
+          });
+        }
+      });
+
+      const previousHigh = parseInt(localStorage.getItem("highScore")) || 0;
+      if (score > previousHigh) {
+        localStorage.setItem("highScore", score);
+        highScoreDiv.textContent = `Highest Score: ${score} / ${questions.length}`;
+      }
+
+      resultDiv.innerHTML = `<h3>You scored ${score} out of ${questions.length}</h3>`;
+
+      if (wrongAnswers.length > 0) {
+        let wrongHTML = "<h4>Review your mistakes:</h4><ul>";
+        wrongAnswers.forEach(item => {
+          wrongHTML += `
+            <li>
+              <strong>Q${item.questionNumber}:</strong> ${item.questionText}<br>
+              <strong>Correct Answer:</strong> ${item.correctAnswer}
+            </li>`;
+        });
+        wrongHTML += "</ul>";
+        resultDiv.innerHTML += wrongHTML;
+      }
+    });
+
+    document.getElementById("toggleSidebar").addEventListener("click", () => {
+      document.getElementById("sidebar").classList.toggle("show");
+    });
+  </script>
+</body>
+</html>
