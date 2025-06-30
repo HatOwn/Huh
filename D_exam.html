@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vocabulary Cloze Quiz</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 2rem;
+      background-color: #1e2a38;
+      color: #f0f0f0;
+      /* Add padding to the bottom to prevent the submit button from overlapping the last question */
+      padding-bottom: 80px;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 2.5rem;
+      color: #ffffff;
+      margin-bottom: 0.5rem;
+    }
+
+    #highScoreDisplay {
+      text-align: center;
+      font-size: 1.2rem;
+      margin-bottom: 2rem;
+      color: #aad0ff;
+    }
+
+    .quiz-item {
+      background: #ffffff;
+      color: #222;
+      padding: 1rem 1.5rem;
+      margin: 1rem auto;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      max-width: 800px;
+    }
+
+    .question {
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+      font-size: 1.1rem;
+    }
+
+    .options label {
+      display: block;
+      margin-bottom: 0.4rem;
+      cursor: pointer;
+    }
+
+    /* ## MODIFIED CSS RULE ## */
+    .submit-btn {
+      position: fixed; /* Set position to fixed */
+      bottom: 20px;     /* Position 20px from the bottom */
+      left: 20px;       /* Position 20px from the left */
+      padding: 0.7rem 2.5rem;
+      font-size: 1.1rem;
+      background-color: #2196f3;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      z-index: 1100; /* Ensure it stays on top of other content */
+    }
+
+    .submit-btn:hover {
+      background-color: #1769aa;
+    }
+
+    .result {
+      background-color: #ffffff;
+      color: #222;
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 1.5rem;
+      border-radius: 10px;
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+      font-size: 1.1rem;
+    }
+
+    ul {
+      padding-left: 1.2rem;
+    }
+
+    li {
+      margin-bottom: 0.8rem;
+    }
+
+    #sidebar {
+      position: fixed;
+      top: 80px;
+      right: 10px;
+      background-color: #263544;
+      padding: 1rem;
+      border-radius: 10px 0 0 10px;
+      color: #fff;
+      width: 140px;
+      transform: translateX(100%);
+      transition: transform 0.3s ease;
+      z-index: 1000;
+      box-shadow: -4px 0 10px rgba(0,0,0,0.2);
+      max-height: 80vh; /* 限高 */
+      overflow-y: auto; /* 捲動 */
+    }
+
+    #sidebar.show {
+      transform: translateX(0);
+    }
+
+    #sidebar h3 {
+      font-size: 1rem;
+      margin-bottom: 0.5rem;
+      text-align: center;
+    }
+
+    #sidebar ul {
+      list-style: none;
+      padding-left: 0;
+      text-align: center;
+    }
+
+    #sidebar li {
+      margin: 0.3rem 0;
+    }
+
+    #sidebar button {
+      background-color: #2196f3;
+      border: none;
+      color: white;
+      border-radius: 6px;
+      padding: 5px 8px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      width: 100%;
+      transition: background-color 0.3s ease;
+    }
+
+    #sidebar button:hover {
+      background-color: #1565c0;
+    }
+
+    #toggleSidebar {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background-color: #2196f3;
+      color: white;
+      border: none;
+      border-radius: 50px;
+      padding: 10px 15px;
+      font-size: 1rem;
+      cursor: pointer;
+      z-index: 1100;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    }
+    #homeBtn {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      padding: 8px 14px;
+      background-color: #2196f3;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      z-index: 1100;
+    }
+
+    #homeBtn:hover {
+      background-color: #1565c0;
+    }
+  </style>
+</head>
+<body>
+  <button id="homeBtn" onclick="location.href='index.html'">返回主頁</button>
+  <h1>Vocabulary Cloze Quiz</h1>
+  <div id="highScoreDisplay" class="result"></div>
+  <button id="toggleSidebar">☰ 題目</button>
+  <div id="sidebar">
+    <h3>Jump to</h3>
+    <ul id="navList"></ul>
+  </div>
+
+  <form id="quizForm"></form>
+  <div class="result" id="result"></div>
+
+  <script>
+  const questions = [
+  { "q": "A ___ art critic can spot the difference between a masterpiece and a fake.", "a": "B", "o": ["A. dogmatic", "B. discerning", "C. desolate", "D. despondent"] },
+  { "q": "From this point, the path will ___ into two separate trails.", "a": "A", "o": ["A. diverge", "B. deduce", "C. diminish", "D. delude"] },
+  { "q": "There was a ___ between the two witnesses' accounts of the event.", "a": "A", "o": ["A. discrepancy", "B. deposition", "C. digression", "D. dissolution"] },
+  { "q": "The ___ of the old partnership was a sad event for both founders.", "a": "B", "o": ["A. degradation", "B. dissolution", "C. digression", "D. deposition"] },
+  { "q": "The presence of security cameras acts as a ___ to potential thieves.", "a": "C", "o": ["A. dilemma", "B. deluge", "C. deterrent", "D. debacle"] },
+  { "q": "The ___ sound of the out-of-tune instruments was painful to hear.", "a": "C", "o": ["A. dynamic", "B. discrete", "C. discordant", "D. disinterested"] },
+  { "q": "The city is known for its culturally ___ population.", "a": "C", "o": ["A. devious", "B. despondent", "C. diverse", "D. dismal"] },
+  { "q": "We ___ the use of violence and always seek peaceful solutions.", "a": "D", "o": ["A. derive", "B. deploy", "C. deduce", "D. deplore"] },
+  { "q": "The con artist tried to ___ her attention while his accomplice stole her wallet.", "a": "A", "o": ["A. divert", "B. deduce", "C. debase", "D. delude"] },
+  { "q": "A feeling of ___ grew between the two former friends after their argument.", "a": "D", "o": ["A. deference", "B. diligence", "C. deposition", "D. dissonance"] },
+  { "q": "From the evidence, the detective was able to ___ the killer's identity.", "a": "B", "o": ["A. defame", "B. deduce", "C. despise", "D. deduct"] },
+  { "q": "The police used tear gas to ___ the crowd of protestors.", "a": "A", "o": ["A. disperse", "B. deplete", "C. derive", "D. deduce"] },
+  { "q": "The decision to sell the company was a ___ one, made after much thought.", "a": "C", "o": ["A. despondent", "B. devious", "C. deliberate", "D. disinterested"] },
+  { "q": "The planned ___ of the old stadium will make way for a new park.", "a": "A", "o": ["A. demolition", "B. dissipation", "C. degradation", "D. deposition"] },
+  { "q": "The once-great city was sealed in a state of ___ after the ancient curse.", "a": "B", "o": ["A. diligence", "B. doom", "C. dilemma", "D. deference"] },
+  { "q": "She was in great ___ after learning of her friend's accident.", "a": "D", "o": ["A. discretion", "B. dissent", "C. disdain", "D. distress"] },
+  { "q": "The author used vivid language to ___ the beauty of the landscape.", "a": "D", "o": ["A. detain", "B. deplore", "C. debase", "D. depict"] },
+  { "q": "The scandal caused a ___ in the politician's popularity.", "a": "A", "o": ["A. diminution", "B. dissertation", "C. deposition", "D. debacle"] },
+  { "q": "The protest caused a major ___ to traffic in the city center.", "a": "A", "o": ["A. disruption", "B. deposition", "C. dissension", "D. dilemma"] },
+  { "q": "He was a ___ person who seemed to enjoy arguing with everyone.", "a": "A", "o": ["A. disputatious", "B. desolate", "C. despondent", "D. dogmatic"] },
+  { "q": "The music festival turned into a ___ due to heavy rain and technical failures.", "a": "D", "o": ["A. domain", "B. dividend", "C. dilemma", "D. debacle"] },
+  { "q": "If you ___ on your loan payments, the bank may repossess your car.", "a": "D", "o": ["A. descend", "B. deduce", "C. decay", "D. default"] },
+  { "q": "It is unfair to ___ the two artists, as their styles are completely different.", "a": "A", "o": ["A. disparage", "B. deploy", "C. dispatch", "D. deduce"] },
+  { "q": "The surgeon was incredibly ___, with steady hands and precise movements.", "a": "C", "o": ["A. despondent", "B. dogmatic", "C. dexterous", "D. dubious"] },
+  { "q": "Shareholders will receive a ___ at the end of the fiscal year.", "a": "B", "o": ["A. deposition", "B. dividend", "C. debacle", "D. dilema"] },
+  { "q": "The good news helped to ___ her fears about the future.", "a": "C", "o": ["A. dismantle", "B. disparage", "C. dispel", "D. disdain"] },
+  { "q": "The cruel ___ ruled the country with an iron fist, suppressing all opposition.", "a": "A", "o": ["A. despot", "B. drone", "C. debutante", "D. dissident"] },
+  { "q": "Water was added to ___ the strong acid to a safe concentration.", "a": "D", "o": ["A. diffuse", "B. delude", "C. deduce", "D. dilute"] },
+  { "q": "He was ___ about the success of the plan, as it seemed too risky.", "a": "B", "o": ["A. despondent", "B. dubious", "C. dogmatic", "D. definitive"] },
+  { "q": "The article was designed to ___ the candidate and ruin his chances in the election.", "a": "B", "o": ["A. deduce", "B. defame", "C. deride", "D. deplore"] },
+  { "q": "There is a great ___ in wealth between the richest and poorest citizens.", "a": "B", "o": ["A. demolition", "B. disparity", "C. deposition", "D. depravity"] },
+  { "q": "The landscape was ___ and empty, with no signs of life for miles.", "a": "B", "o": ["A. dexterous", "B. desolate", "C. didactic", "D. definitive"] },
+  { "q": "The police have the authority to ___ anyone suspected of a crime.", "a": "D", "o": ["A. degrade", "B. deduce", "C. deplore", "D. detain"] },
+  { "q": "She faced the ___ of choosing between her career and her family.", "a": "A", "o": ["A. dilemma", "B. deluge", "C. domain", "D. debacle"] },
+  { "q": "The driver had to ___ as he approached the sharp curve in the road.", "a": "C", "o": ["A. deviate", "B. dissipate", "C. decelerate", "D. disdain"] },
+  { "q": "The knight showed great ___ to his king, bowing deeply.", "a": "D", "o": ["A. depravity", "B. diligence", "C. defiance", "D. deference"] },
+  { "q": "The scent of the flowers began to ___ throughout the room.", "a": "D", "o": ["A. deduce", "B. debase", "C. delude", "D. diffuse"] },
+  { "q": "Any plan to ___ from the original plan must be approved by the committee.", "a": "C", "o": ["A. derive", "B. descend", "C. deviate", "D. deduce"] },
+  { "q": "The encyclopedia provides a ___ guide to the animal kingdom.", "a": "C", "o": ["A. discrete", "B. despondent", "C. definitive", "D. derivative"] },
+  { "q": "The activist group will publicly ___ the company's harmful environmental practices.", "a": "A", "o": ["A. decry", "B. degrade", "C. deduce", "D. delude"] },
+  { "q": "The process can be broken down into several ___ and manageable steps.", "a": "A", "o": ["A. discrete", "B. devious", "C. dogmatic", "D. despondent"] },
+  { "q": "He was a ___ leader who refused to consider any other point of view.", "a": "A", "o": ["A. dogmatic", "B. dubious", "C. disinterested", "D. despondent"] },
+  { "q": "Her ___ and hard work earned her a top position in the company.", "a": "B", "o": ["A. defiance", "B. diligence", "C. depravity", "D. discretion"] },
+  { "q": "The constant ___ of the air conditioner was distracting.", "a": "C", "o": ["A. debacle", "B. domain", "C. drone", "D. dividend"] },
+  { "q": "The landscape was completely ___ of any vegetation.", "a": "D", "o": ["A. despondent", "B. dogmatic", "C. dubious", "D. devoid"] },
+  { "q": "She became ___ after losing her job and her home in the same week.", "a": "A", "o": ["A. despondent", "B. disinterested", "C. discerning", "D. dispassionate"] },
+  { "q": "A ___ is a person who actively challenges an established doctrine or policy.", "a": "C", "o": ["A. debutante", "B. despot", "C. dissident", "D. drone"] },
+  { "q": "A good referee must be ___ and not favor either team.", "a": "B", "o": ["A. devious", "B. disinterested", "C. despondent", "D. desolate"] },
+  { "q": "He had a ___ plan to trick the company out of its money.", "a": "B", "o": ["A. despondent", "B. devious", "C. definitive", "D. dexterous"] },
+  { "q": "In an act of ___, the prisoner refused to follow the guard's orders.", "a": "C", "o": ["A. dilemma", "B. diminution", "C. defiance", "D. deference"] },
+  { "q": "After the lead singer quit, the band decided to ___.", "a": "A", "o": ["A. disband", "B. dispatch", "C. delude", "D. deduce"] },
+  { "q": "The long illness seemed to ___ him, leaving him weak and frail.", "a": "A", "o": ["A. debilitate", "B. decelerate", "C. deride", "D. defame"] },
+  { "q": "The two economists had widely ___ views on how to fix the economy.", "a": "B", "o": ["A. destitute", "B. divergent", "C. despondent", "D. dogmatic"] },
+  { "q": "The editor will ___ a reporter to cover the breaking story.", "a": "A", "o": ["A. dispatch", "B. deduce", "C. delude", "D. despise"] },
+  { "q": "The lawyer took a sworn ___ from the witness before the trial.", "a": "B", "o": ["A. deterrent", "B. deposition", "C. digression", "D. degradation"] },
+  { "q": "The future of the company looked ___ after its main product failed.", "a": "C", "o": ["A. dynamic", "B. discrete", "C. dismal", "D. dogmatic"] },
+  { "q": "You can ___ the cost of business travel from your taxable income.", "a": "D", "o": ["A. deduce", "B. deploy", "C. debase", "D. deduct"] },
+  { "q": "The novel explored the ___ and cruelty of the ruthless dictator.", "a": "A", "o": ["A. depravity", "B. deference", "C. diligence", "D. disparity"] },
+  { "q": "The broken dam caused a ___ that flooded the entire valley.", "a": "B", "o": ["A. debacle", "B. deluge", "C. deadlock", "D. deterrent"] },
+  { "q": "The allegations were intended to ___ him in front of his colleagues.", "a": "A", "o": ["A. discredit", "B. deploy", "C. derive", "D. deduce"] },
+  { "q": "She wrote her doctoral ___ on the history of medieval poetry.", "a": "A", "o": ["A. dissertation", "B. deposition", "C. discrepancy", "D. disruption"] },
+  { "q": "The charming salesman managed to ___ the customer into buying a worthless product.", "a": "A", "o": ["A. delude", "B. denounce", "C. deduce", "D. defame"] },
+  { "q": "I ___ his dishonesty and refuse to work with him again.", "a": "D", "o": ["A. deplete", "B. deduce", "C. derive", "D. despise"] },
+  { "q": "The shark's large ___ fin cut through the water's surface.", "a": "C", "o": ["A. dubious", "B. dogmatic", "C. dorsal", "D. despondent"] },
+  { "q": "As we ___ from the mountain, the air became warmer.", "a": "A", "o": ["A. descend", "B. deviate", "C. dissent", "D. disband"] },
+  { "q": "This new laundry ___ is very effective at removing tough stains.", "a": "B", "o": ["A. deposition", "B. detergent", "C. deterrent", "D. derivative"] },
+  { "q": "It took the mechanics hours to ___ the engine to find the problem.", "a": "B", "o": ["A. dissipate", "B. dismantle", "C. distend", "D. disperse"] },
+  { "q": "The speaker's main point was lost in a series of long ___ about his childhood.", "a": "C", "o": ["A. dissolution", "B. debacle", "C. digression", "D. deposition"] },
+  { "q": "She hated the ___ of her factory job, doing the same task over and over.", "a": "D", "o": ["A. depravity", "B. debacle", "C. dilemma", "D. drudgery"] },
+  { "q": "There was much ___ among the council members regarding the new law.", "a": "A", "o": ["A. dissent", "B. dilemma", "C. discretion", "D. deposition"] },
+  { "q": "Overfishing can severely ___ the fish population in the ocean.", "a": "D", "o": ["A. degrade", "B. deploy", "C. deduce", "D. deplete"] },
+  { "q": "The politician was accused of ___ and betraying his campaign promises.", "a": "D", "o": ["A. diversity", "B. discretion", "C. diligence", "D. duplicity"] },
+  { "q": "The scandal threatened to ___ the family's good name and reputation.", "a": "A", "o": ["A. debase", "B. deploy", "C. derive", "D. deduce"] },
+  { "q": "The morning fog began to ___ as the sun rose higher in the sky.", "a": "D", "o": ["A. deduce", "B. depict", "C. deplete", "D. dissipate"] },
+  { "q": "The new CEO has a ___ leadership style that has energized the entire company.", "a": "A", "o": ["A. dynamic", "B. dogmatic", "C. dismal", "D. dubious"] },
+  { "q": "Without proper maintenance, the wooden bridge began to ___ and fall apart.", "a": "B", "o": ["A. deplete", "B. decay", "C. decry", "D. deduce"] },
+  { "q": "The general decided to ___ troops to the border to strengthen the defense.", "a": "A", "o": ["A. deploy", "B. debase", "C. deride", "D. deplete"] },
+  { "q": "The speaker took the stage to ___ the government's new policies.", "a": "A", "o": ["A. denounce", "B. divert", "C. deploy", "D. deduce"] },
+  { "q": "The once-great empire began to ___ into corruption and chaos.", "a": "B", "o": ["A. disband", "B. degenerate", "C. disperse", "D. decelerate"] },
+  { "q": "Many modern medicines ___ from plants found in the rainforest.", "a": "D", "o": ["A. despise", "B. deploy", "C. debase", "D. derive"] },
+  { "q": "The war left thousands of people ___ and homeless.", "a": "B", "o": ["A. despondent", "B. destitute", "C. derivative", "D. dogmatic"] },
+  { "q": "Her style of painting is a ___ of impressionism and cubism.", "a": "C", "o": ["A. deposition", "B. debacle", "C. derivative", "D. deterrent"] },
+  { "q": "She looked at his shabby clothes with ___ and turned away.", "a": "B", "o": ["A. diligence", "B. disdain", "C. deference", "D. discretion"] },
+  { "q": "This particular ___ of knowledge is reserved for experts in the field.", "a": "A", "o": ["A. domain", "B. debacle", "C. dividend", "D. deadlock"] },
+  { "q": "The factory was designed to ___ crude oil into gasoline.", "a": "A", "o": ["A. distill", "B. deduce", "C. delude", "D. deploy"] },
+  { "q": "Playing video games can be a fun ___ from the stress of work.", "a": "C", "o": ["A. domain", "B. debacle", "C. diversion", "D. deadlock"] },
+  { "q": "The unhealthy diet caused his stomach to ___ uncomfortably.", "a": "B", "o": ["A. dissent", "B. distend", "C. disband", "D. disperse"] },
+  { "q": "The young ___ was presented to high society at the grand ball.", "a": "D", "o": ["A. despot", "B. drone", "C. dissident", "D. debutante"] },
+  { "q": "He felt a strong ___ to go to the party, preferring a quiet night at home.", "a": "C", "o": ["A. deposition", "B. discrepancy", "C. disinclination", "D. deadlock"] },
+  { "q": "The country's biological ___ is threatened by deforestation.", "a": "B", "o": ["A. dilemma", "B. diversity", "C. depravity", "D. dissonance"] },
+  { "q": "The judge used her ___ to give the first-time offender a lighter sentence.", "a": "A", "o": ["A. discretion", "B. degradation", "C. dissertation", "D. discrepancy"] },
+  { "q": "The spoiled food gave him a terrible case of ___.", "a": "A", "o": ["A. diarrhea", "B. drudgery", "C. dissonance", "D. dilemma"] },
+  { "q": "After the storm, the streets were littered with ___ from fallen trees and buildings.", "a": "B", "o": ["A. drudgery", "B. debris", "C. deterrent", "D. deposition"] },
+  { "q": "The critics will often ___ his work, calling it simplistic and unoriginal.", "a": "A", "o": ["A. deride", "B. deploy", "C. deduce", "D. derive"] },
+  { "q": "He was ___ for a solution to his financial problems.", "a": "D", "o": ["A. despondent", "B. dogmatic", "C. dubious", "D. desperate"] },
+  { "q": "Negotiations between the two parties reached a ___ with neither side willing to compromise.", "a": "C", "o": ["A. debutante", "B. debris", "C. deadlock", "D. deluge"] },
+  { "q": "He had a ___ taste in wine, preferring rare and expensive vintages.", "a": "C", "o": ["A. despondent", "B. disputatious", "C. discriminating", "D. dubious"] },
+  { "q": "He felt a deep sense of ___ after being publicly shamed.", "a": "B", "o": ["A. deposition", "B. degradation", "C. dissolution", "D. dissertation"] },
+  { "q": "Pollution can ___ the quality of our air and water over time.", "a": "B", "o": ["A. deploy", "B. degrade", "C. deduce", "D. deplete"] },
+  { "q": "Lack of sleep can be ___ to your health.", "a": "A", "o": ["A. detrimental", "B. despondent", "C. didactic", "D. dogmatic"] },
+  { "q": "Over time, the value of the old car will ___ significantly.", "a": "C", "o": ["A. degenerate", "B. deduce", "C. depreciate", "D. decelerate"] },
+  { "q": "The hurricane will likely ___ the coastal towns.", "a": "C", "o": ["A. debilitate", "B. decelerate", "C. devastate", "D. deduce"] },
+  { "q": "Understanding the ___ of the market is key to successful investing.", "a": "A", "o": ["A. dynamics", "B. dilemmas", "C. discrepancies", "D. depositions"] },
+  { "q": "Aesop's fables are ___ stories that are meant to teach moral lessons.", "a": "C", "o": ["A. dubious", "B. discordant", "C. didactic", "D. despondent"] },
+  { "q": "The judge remained ___ while listening to the emotional testimony.", "a": "B", "o": ["A. despondent", "B. dispassionate", "C. devious", "D. destitute"] },
+  { "q": "The organization's goal is to ___ information about climate change to the public.", "a": "B", "o": ["A. dismantle", "B. disseminate", "C. disparage", "D. deduce"] },
+  { "q": "The ___ of the old factory will be handled by a specialized company.", "a": "D", "o": ["A. deposition", "B. dilemma", "C. digression", "D. disposal"] }
+];
+
+    const form = document.getElementById("quizForm");
+    const resultDiv = document.getElementById("result");
+    const highScoreDiv = document.getElementById("highScoreDisplay");
+    const navList = document.getElementById("navList");
+
+    const storedHighScore = parseInt(localStorage.getItem("highScore")) || 0;
+    highScoreDiv.textContent = `Highest Score: ${storedHighScore} / ${questions.length}`;
+
+    questions.forEach((item, index) => {
+      const container = document.createElement("div");
+      container.className = "quiz-item";
+      container.id = `q${index}`;
+      container.innerHTML = `
+        <div class="question">${index + 1}. ${item.q}</div>
+        <div class="options">
+          ${item.o.map((opt, i) => `<label><input type="radio" name="q${index}" value="${String.fromCharCode(65 + i)}"> ${opt}</label>`).join('')}
+        </div>
+      `;
+      form.appendChild(container);
+
+      const navItem = document.createElement("li");
+      const jumpBtn = document.createElement("button");
+      jumpBtn.textContent = index + 1;
+      jumpBtn.onclick = (e) => {
+        e.preventDefault();
+        document.getElementById(`q${index}`).scrollIntoView({ behavior: 'smooth' });
+      };
+      navItem.appendChild(jumpBtn);
+      navList.appendChild(navItem);
+    });
+
+    const button = document.createElement("button");
+    button.type = "submit";
+    button.className = "submit-btn";
+    button.textContent = "Submit";
+    form.appendChild(button);
+
+    form.addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      let score = 0;
+      const wrongAnswers = [];
+
+      questions.forEach((item, i) => {
+        const selected = form[`q${i}`].value;
+        if (selected === item.a) {
+          score++;
+        } else {
+          const correctIndex = item.a.charCodeAt(0) - 65;
+          wrongAnswers.push({
+            questionNumber: i + 1,
+            questionText: item.q,
+            correctAnswer: item.o[correctIndex]
+          });
+        }
+      });
+
+      const previousHigh = parseInt(localStorage.getItem("highScore")) || 0;
+      if (score > previousHigh) {
+        localStorage.setItem("highScore", score);
+        highScoreDiv.textContent = `Highest Score: ${score} / ${questions.length}`;
+      }
+
+      resultDiv.innerHTML = `<h3>You scored ${score} out of ${questions.length}</h3>`;
+
+      if (wrongAnswers.length > 0) {
+        let wrongHTML = "<h4>Review your mistakes:</h4><ul>";
+        wrongAnswers.forEach(item => {
+          wrongHTML += `
+            <li>
+              <strong>Q${item.questionNumber}:</strong> ${item.questionText}<br>
+              <strong>Correct Answer:</strong> ${item.correctAnswer}
+            </li>`;
+        });
+        wrongHTML += "</ul>";
+        resultDiv.innerHTML += wrongHTML;
+      }
+    });
+
+    document.getElementById("toggleSidebar").addEventListener("click", () => {
+      document.getElementById("sidebar").classList.toggle("show");
+    });
+  </script>
+</body>
+</html>
