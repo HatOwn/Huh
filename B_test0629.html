@@ -1,172 +1,479 @@
-
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"></meta>
-  <meta content="width=device-width, initial-scale=1.0" name="viewport"></meta>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Vocabulary Cloze Quiz</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: 'Segoe UI', sans-serif;
       margin: 2rem;
-      background-color: #f5f5f5;
-      color: #000;
+      background-color: #1e2a38;
+      color: #f0f0f0;
+      /* Add padding to the bottom to prevent the submit button from overlapping the last question */
+      padding-bottom: 80px;
     }
+
     h1 {
       text-align: center;
+      font-size: 2.5rem;
+      color: #ffffff;
+      margin-bottom: 0.5rem;
     }
+
+    #highScoreDisplay {
+      text-align: center;
+      font-size: 1.2rem;
+      margin-bottom: 2rem;
+      color: #aad0ff;
+    }
+
     .quiz-item {
-      background: white;
-      padding: 1rem;
-      margin-bottom: 1rem;
-      border-radius: 8px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      background: #ffffff;
+      color: #222;
+      padding: 1rem 1.5rem;
+      margin: 1rem auto;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      max-width: 800px;
     }
+
     .question {
       font-weight: bold;
       margin-bottom: 0.5rem;
+      font-size: 1.1rem;
     }
+
     .options label {
       display: block;
-      margin-bottom: 0.3rem;
-    }
-    .submit-btn {
-      display: block;
-      margin: 2rem auto;
-      padding: 0.5rem 2rem;
-      font-size: 1rem;
+      margin-bottom: 0.4rem;
       cursor: pointer;
     }
+
+    /* ## MODIFIED CSS RULE ## */
+    .submit-btn {
+      position: fixed; /* Set position to fixed */
+      bottom: 20px;     /* Position 20px from the bottom */
+      left: 20px;       /* Position 20px from the left */
+      padding: 0.7rem 2.5rem;
+      font-size: 1.1rem;
+      background-color: #2196f3;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      z-index: 1100; /* Ensure it stays on top of other content */
+    }
+
+    .submit-btn:hover {
+      background-color: #1769aa;
+    }
+
     .result {
+      background-color: #ffffff;
+      color: #222;
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 1.5rem;
+      border-radius: 10px;
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+      font-size: 1.1rem;
+    }
+
+    ul {
+      padding-left: 1.2rem;
+    }
+
+    li {
+      margin-bottom: 0.8rem;
+    }
+
+    #sidebar {
+      position: fixed;
+      top: 80px;
+      right: 10px;
+      background-color: #263544;
+      padding: 1rem;
+      border-radius: 10px 0 0 10px;
+      color: #fff;
+      width: 140px;
+      transform: translateX(100%);
+      transition: transform 0.3s ease;
+      z-index: 1000;
+      box-shadow: -4px 0 10px rgba(0,0,0,0.2);
+      max-height: 80vh; /* 限高 */
+      overflow-y: auto; /* 捲動 */
+    }
+
+    #sidebar.show {
+      transform: translateX(0);
+    }
+
+    #sidebar h3 {
+      font-size: 1rem;
+      margin-bottom: 0.5rem;
       text-align: center;
-      font-size: 1.2rem;
-      margin-top: 2rem;
-      font-weight: bold;
+    }
+
+    #sidebar ul {
+      list-style: none;
+      padding-left: 0;
+      text-align: center;
+    }
+
+    #sidebar li {
+      margin: 0.3rem 0;
+    }
+
+    #sidebar button {
+      background-color: #2196f3;
+      border: none;
+      color: white;
+      border-radius: 6px;
+      padding: 5px 8px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      width: 100%;
+      transition: background-color 0.3s ease;
+    }
+
+    #sidebar button:hover {
+      background-color: #1565c0;
+    }
+
+    #toggleSidebar {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background-color: #2196f3;
+      color: white;
+      border: none;
+      border-radius: 50px;
+      padding: 10px 15px;
+      font-size: 1rem;
+      cursor: pointer;
+      z-index: 1100;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    }
+    #homeBtn {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      padding: 8px 14px;
+      background-color: #2196f3;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      z-index: 1100;
+    }
+
+    #homeBtn:hover {
+      background-color: #1565c0;
     }
   </style>
 </head>
 <body>
+  <button id="homeBtn" onclick="location.href='index.html'">返回主頁</button>
   <h1>Vocabulary Cloze Quiz</h1>
+  <div id="highScoreDisplay" class="result"></div>
+  <button id="toggleSidebar">☰ 題目</button>
+  <div id="sidebar">
+    <h3>Jump to</h3>
+    <ul id="navList"></ul>
+  </div>
+
   <form id="quizForm"></form>
   <div class="result" id="result"></div>
+
   <script>
   const questions = [
-    {q: "The king decided to ___ the throne and live a quiet life in the countryside.", a: "B", o: ["A. abbreviate", "B. abdicate", "C. abolish", "D. abduct"]},
-    {q: "She couldn't ___ the sight of cruelty to animals.", a: "B", o: ["A. abide", "B. abhor", "C. accelerate", "D. adore"]},
-    {q: "His ___ living conditions shocked the social workers.", a: "B", o: ["A. abrasive", "B. abject", "C. acute", "D. affable"]},
-    {q: "The government plans to ___ outdated laws.", a: "C", o: ["A. abdicate", "B. allude", "C. abolish", "D. amass"]},
-    {q: "The ___ people of Australia have a rich cultural heritage.", a: "B", o: ["A. abrasive", "B. aboriginal", "C. affluent", "D. altruistic"]},
-    {q: "The patient underwent an ___ after complications arose.", a: "B", o: ["A. abduction", "B. abortion", "C. accretion", "D. assertion"]},
-    {q: "His ___ comments offended many people.", a: "A", o: ["A. abusive", "B. affable", "C. ardent", "D. amiable"]},
-    {q: "New technologies help to ___ economic growth.", a: "C", o: ["A. acclaim", "B. accumulate", "C. accelerate", "D. allege"]},
-    {q: "The museum is ___ to all visitors.", a: "B", o: ["A. abrasive", "B. accessible", "C. affluent", "D. acidic"]},
-    {q: "The film received great public ___.", a: "B", o: ["A. allocation", "B. acclaim", "C. allure", "D. affliction"]},
-    {q: "Moving from the tropics to Alaska requires time to ___.", a: "C", o: ["A. allude", "B. accost", "C. acclimate", "D. accumulate"]},
-    {q: "She received an ___ for her groundbreaking research.", a: "B", o: ["A. acumen", "B. accolade", "C. allegation", "D. affidavit"]},
-    {q: "He was found guilty as an ___ in the robbery.", a: "B", o: ["A. adversary", "B. accomplice", "C. affiliate", "D. artisan"]},
-    {q: "She was absent; ___, the meeting was postponed.", a: "A", o: ["A. accordingly", "B. alternatively", "C. adversely", "D. allegedly"]},
-    {q: "Interest will ___ on your savings over time.", a: "B", o: ["A. abstain", "B. accrue", "C. agitate", "D. abdicate"]},
-    {q: "Over the years, he managed to ___ a large collection of books.", a: "C", o: ["A. acquire", "B. alleviate", "C. accumulate", "D. afflict"]},
-    {q: "Lemon juice tastes ___.", a: "A", o: ["A. acidic", "B. acute", "C. aloof", "D. abject"]},
-    {q: "His ___ reply surprised everyone.", a: "C", o: ["A. agile", "B. abrasive", "C. abrupt", "D. adept"]},
-    {q: "He chose to ___ from voting on the issue.", a: "C", o: ["A. afflict", "B. appease", "C. abstain", "D. allege"]},
-    {q: "The monk led an ___ life, eating simple foods.", a: "B", o: ["A. affable", "B. abstemious", "C. affluent", "D. acute"]},
-    {q: "___ from alcohol can improve health.", a: "B", o: ["A. Acquisition", "B. Abstinence", "C. Affliction", "D. Abortion"]},
-    {q: "The professor’s explanation was too ___ for the students.", a: "B", o: ["A. abusive", "B. abstruse", "C. affluent", "D. altruistic"]},
-    {q: "The loud music was __ to his ears.", a: "C", o: ["A. acidic", "B. acoustic", "C. abrasive", "D. affable"]},
-    {q: "She is ___ in mathematics and solves problems quickly.", a: "A", o: ["A. adept", "B. affluent", "C. archaic", "D. articulate"]},
-    {q: "The teacher ___ the student for being late.", a: "C", o: ["A. adorned", "B. alienated", "C. admonished", "D. afflicted"]},
-    {q: "The princess wore a diamond tiara to ___ her hair.", a: "A", o: ["A. adorn", "B. allocate", "C. afflict", "D. abbreviate"]},
-    {q: "He responded to criticism with ___ skill.", a: "A", o: ["A. adroit", "B. ardent", "C. abstruse", "D. abrasive"]},
-    {q: "His ___ for the singer was evident in his praise.", a: "C", o: ["A. affliction", "B. acquisition", "C. adulation", "D. accusation"]},
-    {q: "The ___ of the computer changed the way people work.", a: "B", o: ["A. adversity", "B. advent", "C. acclaim", "D. anomaly"]},
-    {q: "His ___ made him a fierce competitor.", a: "D", o: ["A. amicability", "B. adversary", "C. adversity", "D. animosity"]},
-    {q: "After a year of ___, she finally found a stable job.", a: "A", o: ["A. adversity", "B. amnesty", "C. ardor", "D. agility"]},
-    {q: "The building has an ___ design with modern lines.", a: "B", o: ["A. archaic", "B. aesthetic", "C. affluent", "D. arable"]},
-    {q: "The lawyer submitted a sworn ___.", a: "B", o: ["A. affiliate", "B. affidavit", "C. acumen", "D. appendix"]},
-    {q: "The company is an ___ of a multinational firm.", a: "B", o: ["A. affidavit", "B. affiliate", "C. alloy", "D. altercation"]},
-    {q: "She tried to ___ the fears of the child.", a: "B", o: ["A. alienate", "B. allay", "C. allude", "D. accumulate"]},
-    {q: "Painkillers help ___ the symptoms.", a: "A", o: ["A. alleviate", "B. affiliate", "C. afflict", "D. agitate"]},
-    {q: "He was ___ to have stolen the car.", a: "A", o: ["A. alleged", "B. alleged", "C. abolished", "D. adorned"]},
-    {q: "The story was a symbolic ___.", a: "C", o: ["A. affinity", "B. allege", "C. allegory", "D. acumen"]},
-    {q: "Funds were ___ to various departments.", a: "B", o: ["A. affixed", "B. allotted", "C. afflicted", "D. alluded"]},
-    {q: "The metals were combined to form an ___.", a: "A", o: ["A. alloy", "B. affiliate", "C. aggregate", "D. amnesty"]},
-    {q: "He ___ to problems without directly stating them.", a: "B", o: ["A. allured", "B. alluded", "C. alleviated", "D. accosted"]},
-    {q: "The perfume's ___ attracted many customers.", a: "B", o: ["A. affliction", "B. allure", "C. abstinence", "D. altercation"]},
-    {q: "The bird soared ___.", a: "B", o: ["A. amply", "B. aloft", "C. agape", "D. acute"]},
-    {q: "He stood ___ from the group, uninterested in the discussion.", a: "B", o: ["A. affable", "B. aloof", "C. ardent", "D. agile"]},
-    {q: "A heated ___ broke out between the two men.", a: "B", o: ["A. acquisition", "B. altercation", "C. affidavit", "D. amnesty"]},
-    {q: "Her ___ behavior surprised those who thought her selfish.", a: "B", o: ["A. affable", "B. altruistic", "C. acidic", "D. arid"]},
-    {q: "The two companies decided to ___.", a: "C", o: ["A. amass", "B. allocate", "C. amalgamate", "D. append"]},
-    {q: "He tried to ___ enough money for retirement.", a: "C", o: ["A. append", "B. agitate", "C. amass", "D. alleviate"]},
-    {q: "Her speech was clear and ___.", a: "B", o: ["A. arbitrary", "B. articulate", "C. archaic", "D. abstract"]},
-    {q: "The clever ___ helped him escape from the trap.", a: "B", o: ["A. artifact", "B. artifice", "C. acquisition", "D. appendage"]},
-  ];
+    {q: "He was forced to ___ himself before the conquering king.", a: "A", o: ["A. abase", "B. acclaim", "C. adorn", "D. ascend"]},
+    {q: "Because he was running out of space, he had to ___ his lengthy report.", a: "B", o: ["A. articulate", "B. abbreviate", "C. accumulate", "D. allocate"]},
+    {q: "The aging monarch decided to ___ the throne in favor of his son.", a: "C", o: ["A. ascend", "B. assassinate", "C. abdicate", "D. accumulate"]},
+    {q: "As a pacifist, I ___ violence in all its forms.", a: "D", o: ["A. acclaim", "B. appease", "C. actuate", "D. abhor"]},
+    {q: "All citizens must ___ by the laws of their country.", a: "A", o: ["A. abide", "B. avert", "C. allude", "D. amend"]},
+    {q: "The family lived in ___ poverty after the father lost his job.", a: "B", o: ["A. affluence", "B. abject", "C. altruistic", "D. archaic"]},
+    {q: "The new government voted to ___ the outdated and unjust law.", a: "C", o: ["A. amend", "B. enact", "C. abolish", "D. attest"]},
+    {q: "The museum displayed artifacts from the ___ peoples of the region.", a: "D", o: ["A. ancillary", "B. antiquated", "C. ascetic", "D. aboriginal"]},
+    {q: "The debate over the legality of ___ is a contentious one in many societies.", a: "A", o: ["A. abortion", "B. amnesty", "C. arbitration", "D. annuity"]},
+    {q: "Her ___ personality made it difficult for her to make friends.", a: "B", o: ["A. affable", "B. abrasive", "C. amiable", "D. astute"]},
+    {q: "The meeting ended ___ when the fire alarm went off.", a: "C", o: ["A. arduously", "B. accordingly", "C. abruptly", "D. amicably"]},
+    {q: "The doctor advised him to ___ from smoking and drinking.", a: "D", o: ["A. attest", "B. actuate", "C. accrue", "D. abstain"]},
+    {q: "Known for his ___ lifestyle, the monk ate only simple meals.", a: "A", o: ["A. abstemious", "B. affluent", "C. abusive", "D. ardent"]},
+    {q: "His period of ___ from alcohol lasted for five years.", a: "B", o: ["A. adulation", "B. abstinence", "C. affliction", "D. avarice"]},
+    {q: "The philosopher's lectures were so ___ that few could understand them.", a: "C", o: ["A. articulate", "B. accessible", "C. abstruse", "D. authentic"]},
+    {q: "The coach was fired for his ___ language towards the players.", a: "D", o: ["A. affable", "B. acclaimed", "C. aesthetic", "D. abusive"]},
+    {q: "The driver had to ___ to avoid hitting the deer that ran into the road.", a: "A", o: ["A. accelerate", "B. amble", "C. ascend", "D. allocate"]},
+    {q: "The new ramp makes the building more ___ to people in wheelchairs.", a: "B", o: ["A. aloof", "B. accessible", "C. adverse", "D. anachronism"]},
+    {q: "The new novel received widespread critical ___.", a: "C", o: ["A. affliction", "B. antipathy", "C. acclaim", "D. animosity"]},
+    {q: "It took several months for the foreign student to ___ to the new culture.", a: "D", o: ["A. alienate", "B. agitate", "C. allude", "D. acclimate"]},
+    {q: "She received an ___ for her groundbreaking research in medicine.", a: "B", o: ["A. acumen", "B. accolade", "C. allegation", "D. affidavit"]},
+    {q: "The police are still searching for the thief's ___.", a: "A", o: ["A. accomplice", "B. adversary", "C. arbiter", "D. artisan"]},
+    {q: "He failed the exam, and ___, was not admitted to the university.", a: "C", o: ["A. abruptly", "B. arduously", "C. accordingly", "D. allegedly"]},
+    {q: "Interest will ___ on your savings account over time.", a: "D", o: ["A. atrophy", "B. avert", "C. annihilate", "D. accrue"]},
+    {q: "Over the years, she managed to ___ a small fortune.", a: "A", o: ["A. accumulate", "B. allocate", "C. amalgamate", "D. allay"]},
+    {q: "The ___ in the battery can cause severe burns if it leaks.", a: "B", o: ["A. alloy", "B. acid", "C. alchemy", "D. agent"]},
+    {q: "His ___ wit was sometimes mistaken for genuine rudeness.", a: "C", o: ["A. amiable", "B. affable", "C. acidulous", "D. altruistic"]},
+    {q: "Reaching the ___ of her career, she was recognized as the best in her field.", a: "D", o: ["A. antecedent", "B. anomaly", "C. apogee", "D. acme"]},
+    {q: "A mighty oak tree grows from a tiny ___.", a: "A", o: ["A. acorn", "B. appendix", "C. agent", "D. alloy"]},
+    {q: "The concert hall is renowned for its excellent ___ properties.", a: "B", o: ["A. agrarian", "B. acoustic", "C. archaic", "D. astral"]},
+    {q: "Despite his reservations, he decided to ___ to their demands.", a: "C", o: ["A. antagonize", "B. agitate", "C. acquiesce", "D. afflict"]},
+    {q: "The company's latest ___ is a smaller tech startup.", a: "D", o: ["A. annuity", "B. allotment", "C. acquittal", "D. acquisition"]},
+    {q: "The defendant was relieved to hear the jury's verdict of ___.", a: "A", o: ["A. acquittal", "B. appropriation", "C. arbitration", "D. allegation"]},
+    {q: "The divorce proceedings were ___ and filled with bitterness.", a: "B", o: ["A. amicable", "B. acrimonious", "C. affable", "D. assiduous"]},
+    {q: "The alarm was designed to ___ the sprinkler system in case of a fire.", a: "C", o: ["A. annihilate", "B. allay", "C. actuate", "D. amend"]},
+    {q: "She possessed the business ___ to turn a failing company into a success.", a: "D", o: ["A. apathy", "B. avarice", "C. artifice", "D. acumen"]},
+    {q: "He suffered from an ___ case of appendicitis and needed immediate surgery.", a: "A", o: ["A. acute", "B. atypical", "C. archaic", "D. arbitrary"]},
+    {q: "She is an ___ musician, skilled at playing several instruments.", a: "B", o: ["A. ailing", "B. adept", "C. abusive", "D. adverse"]},
+    {q: "The professor is an ___ to the main research team.", a: "C", o: ["A. adversary", "B. agent", "C. adjunct", "D. autocrat"]},
+    {q: "The teacher had to ___ the student for his constant tardiness.", a: "D", o: ["A. acclaim", "B. adorn", "C. appease", "D. admonish"]},
+    {q: "They chose to ___ the room with festive decorations for the party.", a: "A", o: ["A. adorn", "B. abase", "C. afflict", "D. agitate"]},
+    {q: "The ___ diplomat skillfully negotiated the peace treaty.", a: "B", o: ["A. abrasive", "B. adroit", "C. antagonistic", "D. ascetic"]},
+    {q: "The rock star grew tired of the constant ___ from his fans.", a: "C", o: ["A. adversity", "B. animosity", "C. adulation", "D. arbitration"]},
+    {q: "The ___ of the internet has revolutionized communication.", a: "D", o: ["A. anomaly", "B. antecedent", "C. annuity", "D. advent"]},
+    {q: "In the story, the hero must defeat his wicked ___.", a: "A", o: ["A. adversary", "B. accomplice", "C. affiliate", "D. advocate"]},
+    {q: "The medicine had an ___ effect, making the patient feel dizzy.", a: "B", o: ["A. affirmative", "B. adverse", "C. authentic", "D. altruistic"]},
+    {q: "She overcame great ___ to achieve her goals.", a: "C", o: ["A. affluence", "B. amenity", "C. adversity", "D. amity"]},
+    {q: "The museum's collection is valued for its ___ quality.", a: "D", o: ["A. abrasive", "B. agrarian", "C. angular", "D. aesthetic"]},
+    {q: "Her ___ nature made her popular with her colleagues.", a: "A", o: ["A. affable", "B. antagonistic", "C. acidulous", "D. abusive"]},
+    {q: "He spoke in an ___ manner, using a vocabulary that wasn't his own.", a: "B", o: ["A. authentic", "B. affected", "C. articulate", "D. aseptic"]},
+    {q: "The witness signed an ___ swearing that her testimony was true.", a: "C", o: ["A. allegory", "B. annuity", "C. affidavit", "D. agenda"]},
+    {q: "Our company is an ___ of a larger, multinational corporation.", a: "D", o: ["A. automaton", "B. archetype", "C. agglomeration", "D. affiliate"]},
+    {q: "She gave an ___ response, nodding her head in agreement.", a: "A", o: ["A. affirmative", "B. ambiguous", "C. arbitrary", "D. adverse"]},
+    {q: "The disease is known to ___ the nervous system.", a: "B", o: ["A. allay", "B. afflict", "C. appease", "D. amend"]},
+    {q: "Poverty is a great ___ for many people around the world.", a: "C", o: ["A. amenity", "B. accolade", "C. affliction", "D. affluence"]},
+    {q: "The family lived a life of ___ in a large mansion.", a: "D", o: ["A. adversity", "B. attrition", "C. anonymity", "D. affluence"]},
+    {q: "A common ___ of the medication is a slight headache.", a: "A", o: ["A. aftereffect", "B. antecedent", "C. amenity", "D. aptitude"]},
+    {q: "The children stared, their mouths ___, at the magician's trick.", a: "B", o: ["A. askew", "B. agape", "C. aloft", "D. aloof"]},
+    {q: "The first item on the meeting's ___ is the quarterly budget review.", a: "C", o: ["A. appendix", "B. allegory", "C. agenda", "D. anthology"]},
+    {q: "A secret ___ was sent to spy on the enemy's activities.", a: "D", o: ["A. artisan", "B. anarchist", "C. ascetic", "D. agent"]},
+    {q: "An ___ of various small businesses formed a powerful new corporation.", a: "A", o: ["A. agglomeration", "B. altercation", "C. allotment", "D. anomaly"]},
+    {q: "His sarcastic comments only served to ___ the tense situation.", a: "B", o: ["A. alleviate", "B. aggravate", "C. assuage", "D. ameliorate"]},
+    {q: "The ___ score is the sum of all the individual scores.", a: "C", o: ["A. ancillary", "B. arbitrary", "C. aggregate", "D. asymmetric"]},
+    {q: "The cat showed remarkable ___ as it leaped from one rooftop to another.", a: "D", o: ["A. apathy", "B. adversity", "C. amnesia", "D. agility"]},
+    {q: "The protestors tried to ___ the public against the government.", a: "A", o: ["A. agitate", "B. appease", "C. allay", "D. assuage"]},
+    {q: "The country's economy is primarily ___, based on farming.", a: "B", o: ["A. astral", "B. agrarian", "C. archaic", "D. armored"]},
+    {q: "The ___ economy has led to a rise in unemployment.", a: "C", o: ["A. affluent", "B. authentic", "C. ailing", "D. ardent"]},
+    {q: "The ancient practice of ___ sought to turn lead into gold.", a: "D", o: ["A. astrology", "B. archaeology", "C. anarchy", "D. alchemy"]},
+    {q: "His rude behavior began to ___ his friends.", a: "A", o: ["A. alienate", "B. affiliate", "C. acclaim", "D. adorn"]},
+    {q: "The mother tried to ___ her child's fears of the dark.", a: "B", o: ["A. aggravate", "B. allay", "C. actuate", "D. afflict"]},
+    {q: "The medicine is designed to ___ pain.", a: "C", o: ["A. aggravate", "B. agitate", "C. alleviate", "D. annihilate"]},
+    {q: "The suspect continues to ___ that he is innocent.", a: "D", o: ["A. aver", "B. assent", "C. acquiesce", "D. allege"]},
+    {q: "He was ___ involved in the crime, according to the witness.", a: "A", o: ["A. allegedly", "B. arduously", "C. abruptly", "D. accordingly"]},
+    {q: "The novel is an ___ for the struggle between good and evil.", a: "B", o: ["A. anachronism", "B. allegory", "C. affidavit", "D. annuity"]},
+    {q: "The committee will ___ funds for the new research project.", a: "C", o: ["A. accumulate", "B. amass", "C. allocate", "D. anchor"]},
+    {q: "Each member received their ___ of the profits.", a: "D", o: ["A. acquisition", "B. agglomeration", "C. annuity", "D. allotment"]},
+    {q: "Brass is an ___ of copper and zinc.", a: "A", o: ["A. alloy", "B. acid", "C. agent", "D. acorn"]},
+    {q: "She would often ___ to her childhood in the countryside.", a: "B", o: ["A. abolish", "B. allude", "C. abhor", "D. abase"]},
+    {q: "The mysterious ___ of the forbidden forest tempted the young adventurers.", a: "C", o: ["A. affliction", "B. aversion", "C. allure", "D. ardor"]},
+    {q: "The flag was raised ___ on the flagpole.", a: "D", o: ["A. askew", "B. abruptly", "C. accordingly", "D. aloft"]},
+    {q: "He remained ___ from the rest of the group, preferring his own company.", a: "A", o: ["A. aloof", "B. affable", "C. amiable", "D. altruistic"]},
+    {q: "A heated ___ broke out between the two drivers after the accident.", a: "B", o: ["A. amity", "B. altercation", "C. accolade", "D. accord"]},
+    {q: "If you don't like this option, there is always an ___.", a: "C", o: ["A. antecedent", "B. anomaly", "C. alternative", "D. apparatus"]},
+    {q: "Her ___ donation to the charity helped many in need.", a: "D", o: ["A. avaricious", "B. abusive", "C. adverse", "D. altruistic"]},
+    {q: "The two companies decided to ___ to form a larger corporation.", a: "A", o: ["A. amalgamate", "B. alienate", "C. annihilate", "D. allocate"]},
+    {q: "He worked hard to ___ a great deal of wealth.", a: "B", o: ["A. abase", "B. amass", "C. allay", "D. avert"]},
+    {q: "The politician's ___ statement could be interpreted in several ways.", a: "C", o: ["A. articulate", "B. authentic", "C. ambiguous", "D. affirmative"]},
+    {q: "She felt a great deal of ___ about the decision, unsure if it was the right one.", a: "D", o: ["A. adulation", "B. amity", "C. apathy", "D. ambivalence"]},
+    {q: "The old couple would often ___ through the park on sunny afternoons.", a: "A", o: ["A. amble", "B. accelerate", "C. ascend", "D. agitate"]},
+    {q: "The soldiers prepared to ___ the enemy convoy.", a: "B", o: ["A. appease", "B. ambush", "C. adorn", "D. amend"]},
+    {q: "The new laws are intended to ___ the working conditions for factory employees.", a: "C", o: ["A. aggravate", "B. alienate", "C. ameliorate", "D. annihilate"]},
+    {q: "The committee voted to ___ the constitution.", a: "D", o: ["A. abolish", "B. abhor", "C. abase", "D. amend"]},
+    {q: "The hotel offers a wide range of ___ for its guests, including a pool and spa.", a: "A", o: ["A. amenity", "B. affliction", "C. adversity", "D. anomaly"]},
+    {q: "Despite the disagreement, they maintained an ___ relationship.", a: "B", o: ["A. abrasive", "B. amiable", "C. antagonistic", "D. adverse"]},
+    {q: "The two nations reached an ___ settlement to their dispute.", a: "C", o: ["A. acrimonious", "B. arbitrary", "C. amicable", "D. angular"]},
+    {q: "A spirit of ___ and cooperation existed between the two tribes.", a: "D", o: ["A. animosity", "B. avarice", "C. antipathy", "D. amity"]},
+    {q: "After the accident, he suffered from ___ and couldn't remember his past.", a: "A", o: ["A. amnesia", "B. asthma", "C. apathy", "D. anonymity"]},
+    {q: "The government granted ___ to all political prisoners.", a: "B", o: ["A. annuity", "B. amnesty", "C. accolade", "D. affliction"]},
+    {q: "A typewriter in a modern office is an ___.", a: "C", o: ["A. allegory", "B. anomaly", "C. anachronism", "D. archetype"]},
+    {q: "The teacher used an ___ to explain the complex scientific concept.", a: "D", o: ["A. affidavit", "B. appendix", "C. axiom", "D. analogy"]},
+    {q: "The ___ called for the overthrow of the government.", a: "A", o: ["A. anarchist", "B. autocrat", "C. artisan", "D. arbiter"]},
+    {q: "The ship dropped its ___ in the harbor.", a: "B", o: ["A. alloy", "B. anchor", "C. arsenal", "D. apparatus"]},
+    {q: "The study includes ___ data from a secondary source.", a: "C", o: ["A. authentic", "B. agrarian", "C. ancillary", "D. astral"]},
+    {q: "His face was thin and ___, with sharp cheekbones.", a: "D", o: ["A. affable", "B. aloof", "C. ailing", "D. angular"]},
+    {q: "The artist's goal was to ___ the clay figures and bring them to life.", a: "A", o: ["A. animate", "B. annihilate", "C. alienate", "D. agitate"]},
+    {q: "There was a long-standing ___ between the two families.", a: "B", o: ["A. amity", "B. animosity", "C. accord", "D. adulation"]},
+    {q: "The invaders sought to ___ the entire village.", a: "C", o: ["A. amend", "B. appease", "C. annihilate", "D. adorn"]},
+    {q: "She invested in an ___ to provide a steady income during her retirement.", a: "D", o: ["A. acquisition", "B. allotment", "C. amenity", "D. annuity"]},
+    {q: "A sudden snowstorm in summer would be considered an ___.", a: "A", o: ["A. anomaly", "B. analogy", "C. allegory", "D. anachronism"]},
+    {q: "The author chose to publish the controversial book under the cloak of ___.", a: "B", o: ["A. adversity", "B. anonymity", "C. amity", "D. affluence"]},
+    {q: "His ___ remarks created a hostile atmosphere in the meeting.", a: "C", o: ["A. amiable", "B. altruistic", "C. antagonistic", "D. affable"]},
+    {q: "The historian studied the ___ events that led up to the war.", a: "D", o: ["A. ancillary", "B. aftereffect", "C. appendix", "D. antecedent"]},
+    {q: "The doctor prescribed a powerful ___ to fight the bacterial infection.", a: "A", o: ["A. antibiotic", "B. anecdote", "C. antidote", "D. annuity"]},
+    {q: "She felt a deep ___ towards her arrogant and condescending boss.", a: "B", o: ["A. adulation", "B. antipathy", "C. amity", "D. ardor"]},
+    {q: "The ___ laws were no longer relevant in modern society.", a: "C", o: ["A. astronomical", "B. authentic", "C. antiquated", "D. astute"]},
+    {q: "Voter ___ was high, and the election turnout was disappointingly low.", a: "D", o: ["A. agility", "B. ardor", "C. acumen", "D. apathy"]},
+    {q: "The spaceship reached its ___ at the highest point of its orbit.", a: "A", o: ["A. apogee", "B. acme", "C. agglomeration", "D. arsenal"]},
+    {q: "The laboratory was filled with complex scientific ___.", a: "B", o: ["A. artifice", "B. apparatus", "C. archives", "D. annuity"]},
+    {q: "The diplomat's goal was to ___ the angry dictator and avoid war.", a: "C", o: ["A. aggravate", "B. agitate", "C. appease", "D. afflict"]},
+    {q: "The book includes an ___ with additional notes and references.", a: "D", o: ["A. allegory", "B. anachronism", "C. agenda", "D. appendix"]},
+    {q: "The police managed to ___ the fleeing suspect.", a: "A", o: ["A. apprehend", "B. allay", "C. appease", "D. assent"]},
+    {q: "He felt a growing ___ as the date of his final exam approached.", a: "B", o: ["A. adulation", "B. apprehension", "C. amity", "D. ardor"]},
+    {q: "The government's ___ of funds for the arts was heavily criticized.", a: "C", o: ["A. acquittal", "B. annuity", "C. appropriation", "D. arbitration"]},
+    {q: "She has a natural ___ for learning languages.", a: "D", o: ["A. antipathy", "B. affliction", "C. avarice", "D. aptitude"]},
+    {q: "The farmer was proud of his ___ land, which was perfect for growing crops.", a: "A", o: ["A. arable", "B. archaic", "C. arid", "D. angular"]},
+    {q: "The judge acted as the final ___ in the dispute.", a: "B", o: ["A. adversary", "B. arbiter", "C. accomplice", "D. anarchist"]},
+    {q: "The dictator's decisions were often ___, without any logical reason.", a: "C", o: ["A. astute", "B. articulate", "C. arbitrary", "D. assiduous"]},
+    {q: "The two parties agreed to ___ their differences in court.", a: "D", o: ["A. aggravate", "B. annihilate", "C. agitate", "D. arbitrate"]},
+    {q: "The dispute was settled through ___ rather than a lengthy court battle.", a: "A", o: ["A. arbitration", "B. altercation", "C. appropriation", "D. affliction"]},
+    {q: "He studied ___ to learn about ancient civilizations.", a: "B", o: ["A. astrology", "B. archaeology", "C. alchemy", "D. anatomy"]},
+    {q: "The word 'thou' is an ___ term that is no longer in common use.", a: "C", o: ["A. atypical", "B. astronomical", "C. archaic", "D. agrarian"]},
+    {q: "The hero of the story is an ___ of courage and selflessness.", a: "D", o: ["A. anachronism", "B. anomaly", "C. antagonist", "D. archetype"]},
+    {q: "The ___ is a chain of islands in the Pacific Ocean.", a: "A", o: ["A. archipelago", "B. agglomeration", "C. apparatus", "D. arsenal"]},
+    {q: "Historical documents are carefully preserved in the national ___.", a: "B", o: ["A. appendix", "B. archives", "C. annuity", "D. asylum"]},
+    {q: "She is an ___ supporter of environmental protection.", a: "C", o: ["A. aloof", "B. apathetic", "C. ardent", "D. averse"]},
+    {q: "He spoke with great ___ about his passion for music.", a: "D", o: ["A. apathy", "B. antipathy", "C. attrition", "D. ardor"]},
+    {q: "The team worked ___ to meet the tight deadline.", a: "A", o: ["A. arduously", "B. abruptly", "C. allegedly", "D. accordingly"]},
+    {q: "The tank was heavily ___ and could withstand enemy fire.", a: "B", o: ["A. agile", "B. armored", "C. animate", "D. ancillary"]},
+    {q: "The nation built up a large ___ of weapons in preparation for war.", a: "C", o: ["A. asylum", "B. archive", "C. arsenal", "D. amenity"]},
+    {q: "The fire was determined to be an act of ___.", a: "D", o: ["A. arbitration", "B. alchemy", "C. augury", "D. arson"]},
+    {q: "She is a highly ___ speaker who can captivate any audience.", a: "A", o: ["A. articulate", "B. abrasive", "C. aloof", "D. anonymous"]},
+    {q: "His claim of being a long-lost prince was nothing but a clever ___.", a: "B", o: ["A. affidavit", "B. artifice", "C. attribute", "D. augury"]},
+    {q: "A skilled ___ crafted the beautiful wooden furniture.", a: "C", o: ["A. anarchist", "B. arbiter", "C. artisan", "D. autocrat"]},
+    {q: "The climbers began to ___ the steep mountain face.", a: "D", o: ["A. abase", "B. amble", "C. avert", "D. ascend"]},
+    {q: "The party gained ___ after winning the recent election.", a: "A", o: ["A. ascendancy", "B. affliction", "C. amity", "D. apathy"]},
+    {q: "The detective's job was to ___ the truth behind the mystery.", a: "B", o: ["A. abolish", "B. ascertain", "C. ascribe", "D. assent"]},
+    {q: "The monk lived an ___ life of prayer and solitude.", a: "C", o: ["A. affluent", "B. affable", "C. ascetic", "D. altruistic"]},
+    {q: "They ___ their success to a combination of hard work and luck.", a: "D", o: ["A. annihilate", "B. alienate", "C. apprehend", "D. ascribe"]},
+    {q: "The operating room must be kept in an ___ condition to prevent infection.", a: "A", o: ["A. aseptic", "B. acidic", "C. archaic", "D. abrasive"]},
+    {q: "The picture on the wall was slightly ___, hanging at a crooked angle.", a: "B", o: ["A. aloft", "B. askew", "C. agape", "D. afloat"]},
+    {q: "Her lifelong ___ was to become a doctor and help people.", a: "C", o: ["A. affliction", "B. aversion", "C. aspiration", "D. annuity"]},
+    {q: "There was a plot to ___ the political leader.", a: "D", o: ["A. acclaim", "B. adorn", "C. appease", "D. assassinate"]},
+    {q: "After much debate, the committee finally gave its ___ to the proposal.", a: "A", o: ["A. assent", "B. aversion", "C. antipathy", "D. attrition"]},
+    {q: "The teacher made an ___ of the student's progress.", a: "B", o: ["A. acquisition", "B. assessment", "C. appropriation", "D. altercation"]},
+    {q: "The ___ student always completed her homework on time.", a: "C", o: ["A. abrasive", "B. apathetic", "C. assiduous", "D. aloof"]},
+    {q: "It can be difficult for immigrants to ___ into a new culture.", a: "D", o: ["A. alienate", "B. agitate", "C. allocate", "D. assimilate"]},
+    {q: "He tried to ___ his friend's guilt by offering words of comfort.", a: "A", o: ["A. assuage", "B. aggravate", "C. afflict", "D. apprehend"]},
+    {q: "His ___ made it difficult for him to participate in sports.", a: "B", o: ["A. amnesia", "B. asthma", "C. agility", "D. ardor"]},
+    {q: "The psychic claimed to have ___ powers and could see into other dimensions.", a: "C", o: ["A. agrarian", "B. archaic", "C. astral", "D. ascetic"]},
+    {q: "She consulted a book on ___ to see what her horoscope predicted.", a: "D", o: ["A. archaeology", "B. alchemy", "C. anatomy", "D. astrology"]},
+    {q: "The cost of the project was ___, far exceeding the initial budget.", a: "A", o: ["A. astronomical", "B. ancillary", "C. arbitrary", "D. arable"]},
+    {q: "The ___ investor made a fortune on the stock market.", a: "B", o: ["A. abrasive", "B. astute", "C. ailing", "D. antagonistic"]},
+    {q: "The design was intentionally ___, with one side longer than the other.", a: "C", o: ["A. angular", "B. authentic", "C. asymmetric", "D. archaic"]},
+    {q: "Muscles will ___ if they are not used regularly.", a: "D", o: ["A. accelerate", "B. accrue", "C. ascend", "D. atrophy"]},
+    {q: "Several witnesses can ___ to the defendant's innocence.", a: "A", o: ["A. attest", "B. avert", "C. afflict", "D. allege"]},
+    {q: "You should consult an ___ before signing any legal documents.", a: "B", o: ["A. artisan", "B. attorney", "C. autocrat", "D. agent"]},
+    {q: "Kindness is a positive ___ that she possesses.", a: "C", o: ["A. artifice", "B. affliction", "C. attribute", "D. anomaly"]},
+    {q: "The company had a high rate of employee ___ due to poor working conditions.", a: "D", o: ["A. affluence", "B. amity", "C. accolade", "D. attrition"]},
+    {q: "His behavior was ___; he was usually much more cheerful.", a: "A", o: ["A. atypical", "B. authentic", "C. affable", "D. assiduous"]},
+    {q: "The accountant was hired to perform an ___ of the company's financial records.", a: "B", o: ["A. acquittal", "B. audit", "C. augury", "D. arbitration"]},
+    {q: "In ancient Rome, priests would interpret the ___ of the gods.", a: "C", o: ["A. allegory", "B. archives", "C. augury", "D. annuity"]},
+    {q: "The museum verified that the painting was an ___ masterpiece.", a: "D", o: ["A. antiquated", "B. ambiguous", "C. affected", "D. authentic"]},
+    {q: "The expert was called to ___ the signature on the document.", a: "A", o: ["A. authenticate", "B. abbreviate", "C. annihilate", "D. ascribe"]},
+    {q: "The country was ruled by an ___ government that suppressed all dissent.", a: "B", o: ["A. autonomous", "B. altruistic", "C. amicable", "D. authoritarian"]},
+    {q: "The ___ had absolute power and ruled without any checks or balances.", a: "C", "o": ["A. accomplice", "B. anarchist", "C. autocrat", "D. arbiter"]},
+    {q: "The factory worker felt like a mere ___ in a large, impersonal machine.", a: "D", o: ["A. artisan", "B. agent", "C. adjunct", "D. automaton"]},
+    {q: "The region was granted ___ status and could govern itself.", a: "A", o: ["A. autonomous", "B. ancillary", "C. antagonistic", "D. arbitrary"]},
+    {q: "The citizens fought for their ___ and the right to self-government.", a: "B", o: ["A. anonymity", "B. autonomy", "C. amity", "D. annuity"]},
+    {q: "The main engine failed, so the pilot had to rely on the ___ power unit.", a: "C", o: ["A. acute", "B. archaic", "C. auxiliary", "D. agrarian"]},
+    {q: "The miser's ___ was so great that he refused to spend money on even basic necessities.", a: "D", o: ["A. ardor", "B. adulation", "C. apathy", "D. avarice"]},
+    {q: "She was prepared to ___ in court that she had seen the defendant at the scene.", a: "A", o: ["A. aver", "B. avert", "C. allude", "D. assail"]},
+    {q: "He is ___ to taking risks and prefers a more cautious approach.", a: "B", o: ["A. ardent", "B. averse", "C. affable", "D. astute"]},
+    {q: "Quick reflexes allowed the driver to ___ a serious accident.", a: "C", o: ["A. actuate", "B. accelerate", "C. avert", "D. aggravate"]},
+    {q: "To publicly criticize and ___ your own child is a cruel thing to do.", a: "A", o: ["A. abase", "B. acclaim", "C. allude", "D. attest"]},
+    {q: "I absolutely ___ the way he chews with his mouth open.", a: "B", o: ["A. adorn", "B. abhor", "C. abide", "D. appease"]},
+    {q: "The group is campaigning to ___ the death penalty.", a: "C", o: ["A. amend", "B. ascertain", "C. abolish", "D. actuate"]},
+    {q: "The film was met with public ___ and won several awards.", a: "D", o: ["A. antipathy", "B. apprehension", "C. attrition", "D. acclaim"]},
+    {q: "He was arrested as an ___ in the bank robbery.", a: "A", o: ["A. accomplice", "B. adversary", "C. attorney", "D. agent"]},
+    {q: "She plans to ___ her stamp collection over several years.", a: "B", o: ["A. allocate", "B. accumulate", "C. annihilate", "D. alienate"]},
+    {q: "He did not argue, but seemed to ___ in the decision.", a: "C", o: ["A. agitate", "B. antagonize", "C. acquiesce", "D. afflict"]},
+    {q: "Their parting was ___ and filled with angry accusations.", a: "D", o: ["A. affable", "B. amicable", "C. amiable", "D. acrimonious"]},
+    {q: "The teacher would often ___ the students for not paying attention.", a: "A", o: ["A. admonish", "B. acclaim", "C. appease", "D. adorn"]},
+    {q: "The hero finally faced his main ___ in the final chapter.", a: "B", o: ["A. affiliate", "B. adversary", "C. accomplice", "D. artisan"]},
+    {q: "The city's ___ appeal lies in its beautiful architecture and parks.", a: "C", o: ["A. agrarian", "B. abrasive", "C. aesthetic", "D. archaic"]},
+    {q: "A cool cloth can help ___ the sting of a burn.", a: "D", o: ["A. aggravate", "B. agitate", "C. actuate", "D. alleviate"]},
+    {q: "His instructions were deliberately ___, leaving us unsure of what to do.", a: "A", o: ["A. ambiguous", "B. articulate", "C. authentic", "D. affirmative"]},
+    {q: "The city council plans to ___ the downtown area by planting more trees and adding parks.", a: "B", o: ["A. aggravate", "B. ameliorate", "C. alienate", "D. abase"]},
+    {q: "Despite their differences, the two leaders reached an ___ agreement.", a: "C", o: ["A. acrimonious", "B. adverse", "C. amicable", "D. antagonistic"]},
+    {q: "Using a mobile phone in a play about ancient Rome would be a clear ___.", a: "D", o: ["A. allegory", "B. anomaly", "C. archetype", "D. anachronism"]},
+    {q: "The goal of the attack was to completely ___ the enemy's military forces.", a: "A", o: ["A. annihilate", "B. amend", "C. appease", "D. animate"]}
+];
 
-  const form = document.getElementById("quizForm");
-  questions.forEach((item, index) => {
-    const container = document.createElement("div");
-    container.className = "quiz-item";
-    container.innerHTML = `
-      <div class="question">${index + 1}. ${item.q}</div>
-      <div class="options">
-        ${item.o.map((opt, i) => `<label><input type="radio" name="q${index}" value="${String.fromCharCode(65 + i)}"> ${opt}</label>`).join('')}
-      </div>
-    `;
-    form.appendChild(container);
-  });
+    const form = document.getElementById("quizForm");
+    const resultDiv = document.getElementById("result");
+    const highScoreDiv = document.getElementById("highScoreDisplay");
+    const navList = document.getElementById("navList");
 
-  const button = document.createElement("button");
-  button.type = "submit";
-  button.className = "submit-btn";
-  button.textContent = "Submit";
-  form.appendChild(button);
+    const storedHighScore = parseInt(localStorage.getItem("highScore")) || 0;
+    highScoreDiv.textContent = `Highest Score: ${storedHighScore} / ${questions.length}`;
 
-  form.addEventListener("submit", function(e) {
-    e.preventDefault();
+    questions.forEach((item, index) => {
+      const container = document.createElement("div");
+      container.className = "quiz-item";
+      container.id = `q${index}`;
+      container.innerHTML = `
+        <div class="question">${index + 1}. ${item.q}</div>
+        <div class="options">
+          ${item.o.map((opt, i) => `<label><input type="radio" name="q${index}" value="${String.fromCharCode(65 + i)}"> ${opt}</label>`).join('')}
+        </div>
+      `;
+      form.appendChild(container);
 
-    let score = 0;
-    const wrongAnswers = []; // Array to store incorrect answers
+      const navItem = document.createElement("li");
+      const jumpBtn = document.createElement("button");
+      jumpBtn.textContent = index + 1;
+      jumpBtn.onclick = (e) => {
+        e.preventDefault();
+        document.getElementById(`q${index}`).scrollIntoView({ behavior: 'smooth' });
+      };
+      navItem.appendChild(jumpBtn);
+      navList.appendChild(navItem);
+    });
 
-    // Check each question
-    questions.forEach((item, i) => {
-      const selectedValue = form[`q${i}`].value;
+    const button = document.createElement("button");
+    button.type = "submit";
+    button.className = "submit-btn";
+    button.textContent = "Submit";
+    form.appendChild(button);
 
-      if (selectedValue === item.a) {
-        score++;
-      } else {
-        // Find the full text of the correct answer
-        const correctOptionIndex = item.a.charCodeAt(0) - 65; // Converts 'A' to 0, 'B' to 1, etc.
-        const correctOptionText = item.o[correctOptionIndex];
+    form.addEventListener("submit", function(e) {
+      e.preventDefault();
 
-        // Add details to the wrongAnswers array
-        wrongAnswers.push({
-          questionNumber: i + 1,
-          questionText: item.q,
-          correctAnswer: correctOptionText
+      let score = 0;
+      const wrongAnswers = [];
+
+      questions.forEach((item, i) => {
+        const selected = form[`q${i}`].value;
+        if (selected === item.a) {
+          score++;
+        } else {
+          const correctIndex = item.a.charCodeAt(0) - 65;
+          wrongAnswers.push({
+            questionNumber: i + 1,
+            questionText: item.q,
+            correctAnswer: item.o[correctIndex]
+          });
+        }
+      });
+
+      const previousHigh = parseInt(localStorage.getItem("highScore")) || 0;
+      if (score > previousHigh) {
+        localStorage.setItem("highScore", score);
+        highScoreDiv.textContent = `Highest Score: ${score} / ${questions.length}`;
+      }
+
+      resultDiv.innerHTML = `<h3>You scored ${score} out of ${questions.length}</h3>`;
+
+      if (wrongAnswers.length > 0) {
+        let wrongHTML = "<h4>Review your mistakes:</h4><ul>";
+        wrongAnswers.forEach(item => {
+          wrongHTML += `
+            <li>
+              <strong>Q${item.questionNumber}:</strong> ${item.questionText}<br>
+              <strong>Correct Answer:</strong> ${item.correctAnswer}
+            </li>`;
         });
+        wrongHTML += "</ul>";
+        resultDiv.innerHTML += wrongHTML;
       }
     });
 
-    const resultDiv = document.getElementById("result");
-    resultDiv.innerHTML = ""; // Clear previous results first
-
-    // Display the final score
-    resultDiv.innerHTML += `<h3>You scored ${score} out of ${questions.length}</h3>`;
-
-    // Display the list of wrong answers, if there are any
-    if (wrongAnswers.length > 0) {
-      let wrongAnswersHTML = "<h4>Review your mistakes:</h4><ul>";
-      wrongAnswers.forEach(wrong => {
-        wrongAnswersHTML += `
-          <li>
-            <strong>Q${wrong.questionNumber}:</strong> ${wrong.questionText}<br>
-            <strong>Correct Answer:</strong> ${wrong.correctAnswer}
-          </li>`;
-      });
-      wrongAnswersHTML += "</ul>";
-      resultDiv.innerHTML += wrongAnswersHTML;
-    }
-  });
-</script>
+    document.getElementById("toggleSidebar").addEventListener("click", () => {
+      document.getElementById("sidebar").classList.toggle("show");
+    });
+  </script>
 </body>
 </html>
