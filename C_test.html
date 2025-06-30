@@ -10,6 +10,8 @@
       margin: 2rem;
       background-color: #1e2a38;
       color: #f0f0f0;
+      /* Add padding to the bottom to prevent the submit button from overlapping the last question */
+      padding-bottom: 80px;
     }
 
     h1 {
@@ -48,9 +50,11 @@
       cursor: pointer;
     }
 
+    /* ## MODIFIED CSS RULE ## */
     .submit-btn {
-      display: block;
-      margin: 2rem auto;
+      position: fixed; /* Set position to fixed */
+      bottom: 20px;     /* Position 20px from the bottom */
+      left: 20px;       /* Position 20px from the left */
       padding: 0.7rem 2.5rem;
       font-size: 1.1rem;
       background-color: #2196f3;
@@ -59,6 +63,7 @@
       border-radius: 6px;
       cursor: pointer;
       transition: background-color 0.3s ease;
+      z-index: 1100; /* Ensure it stays on top of other content */
     }
 
     .submit-btn:hover {
@@ -171,6 +176,7 @@
   </style>
 </head>
 <body>
+  <button id="homeBtn" onclick="location.href='index.html'">返回主頁</button>
   <h1>Vocabulary Cloze Quiz</h1>
   <div id="highScoreDisplay" class="result"></div>
   <button id="toggleSidebar">☰ 題目</button>
@@ -184,57 +190,168 @@
 
   <script>
   const questions = [
-    {q: "The king decided to ___ the throne and live a quiet life in the countryside.", a: "B", o: ["A. abbreviate", "B. abdicate", "C. abolish", "D. abduct"]},
-    {q: "She couldn't ___ the sight of cruelty to animals.", a: "B", o: ["A. abide", "B. abhor", "C. accelerate", "D. adore"]},
-    {q: "His ___ living conditions shocked the social workers.", a: "B", o: ["A. abrasive", "B. abject", "C. acute", "D. affable"]},
-    {q: "The government plans to ___ outdated laws.", a: "C", o: ["A. abdicate", "B. allude", "C. abolish", "D. amass"]},
-    {q: "The ___ people of Australia have a rich cultural heritage.", a: "B", o: ["A. abrasive", "B. aboriginal", "C. affluent", "D. altruistic"]},
-    {q: "The patient underwent an ___ after complications arose.", a: "B", o: ["A. abduction", "B. abortion", "C. accretion", "D. assertion"]},
-    {q: "His ___ comments offended many people.", a: "A", o: ["A. abusive", "B. affable", "C. ardent", "D. amiable"]},
-    {q: "New technologies help to ___ economic growth.", a: "C", o: ["A. acclaim", "B. accumulate", "C. accelerate", "D. allege"]},
-    {q: "The museum is ___ to all visitors.", a: "B", o: ["A. abrasive", "B. accessible", "C. affluent", "D. acidic"]},
-    {q: "The film received great public ___.", a: "B", o: ["A. allocation", "B. acclaim", "C. allure", "D. affliction"]},
-    {q: "Moving from the tropics to Alaska requires time to ___.", a: "C", o: ["A. allude", "B. accost", "C. acclimate", "D. accumulate"]},
-    {q: "She received an ___ for her groundbreaking research.", a: "B", o: ["A. acumen", "B. accolade", "C. allegation", "D. affidavit"]},
-    {q: "He was found guilty as an ___ in the robbery.", a: "B", o: ["A. adversary", "B. accomplice", "C. affiliate", "D. artisan"]},
-    {q: "She was absent; ___, the meeting was postponed.", a: "A", o: ["A. accordingly", "B. alternatively", "C. adversely", "D. allegedly"]},
-    {q: "Interest will ___ on your savings over time.", a: "B", o: ["A. abstain", "B. accrue", "C. agitate", "D. abdicate"]},
-    {q: "Over the years, he managed to ___ a large collection of books.", a: "C", o: ["A. acquire", "B. alleviate", "C. accumulate", "D. afflict"]},
-    {q: "Lemon juice tastes ___.", a: "A", o: ["A. acidic", "B. acute", "C. aloof", "D. abject"]},
-    {q: "His ___ reply surprised everyone.", a: "C", o: ["A. agile", "B. abrasive", "C. abrupt", "D. adept"]},
-    {q: "He chose to ___ from voting on the issue.", a: "C", o: ["A. afflict", "B. appease", "C. abstain", "D. allege"]},
-    {q: "The monk led an ___ life, eating simple foods.", a: "B", o: ["A. affable", "B. abstemious", "C. affluent", "D. acute"]},
-    {q: "___ from alcohol can improve health.", a: "B", o: ["A. Acquisition", "B. Abstinence", "C. Affliction", "D. Abortion"]},
-    {q: "The professor’s explanation was too ___ for the students.", a: "B", o: ["A. abusive", "B. abstruse", "C. affluent", "D. altruistic"]},
-    {q: "The loud music was __ to his ears.", a: "C", o: ["A. acidic", "B. acoustic", "C. abrasive", "D. affable"]},
-    {q: "She is ___ in mathematics and solves problems quickly.", a: "A", o: ["A. adept", "B. affluent", "C. archaic", "D. articulate"]},
-    {q: "The teacher ___ the student for being late.", a: "C", o: ["A. adorned", "B. alienated", "C. admonished", "D. afflicted"]},
-    {q: "The princess wore a diamond tiara to ___ her hair.", a: "A", o: ["A. adorn", "B. allocate", "C. afflict", "D. abbreviate"]},
-    {q: "He responded to criticism with ___ skill.", a: "A", o: ["A. adroit", "B. ardent", "C. abstruse", "D. abrasive"]},
-    {q: "His ___ for the singer was evident in his praise.", a: "C", o: ["A. affliction", "B. acquisition", "C. adulation", "D. accusation"]},
-    {q: "The ___ of the computer changed the way people work.", a: "B", o: ["A. adversity", "B. advent", "C. acclaim", "D. anomaly"]},
-    {q: "His ___ made him a fierce competitor.", a: "D", o: ["A. amicability", "B. adversary", "C. adversity", "D. animosity"]},
-    {q: "After a year of ___, she finally found a stable job.", a: "A", o: ["A. adversity", "B. amnesty", "C. ardor", "D. agility"]},
-    {q: "The building has an ___ design with modern lines.", a: "B", o: ["A. archaic", "B. aesthetic", "C. affluent", "D. arable"]},
-    {q: "The lawyer submitted a sworn ___.", a: "B", o: ["A. affiliate", "B. affidavit", "C. acumen", "D. appendix"]},
-    {q: "The company is an ___ of a multinational firm.", a: "B", o: ["A. affidavit", "B. affiliate", "C. alloy", "D. altercation"]},
-    {q: "She tried to ___ the fears of the child.", a: "B", o: ["A. alienate", "B. allay", "C. allude", "D. accumulate"]},
-    {q: "Painkillers help ___ the symptoms.", a: "A", o: ["A. alleviate", "B. affiliate", "C. afflict", "D. agitate"]},
-    {q: "He was ___ to have stolen the car.", a: "A", o: ["A. alleged", "B. alleged", "C. abolished", "D. adorned"]},
-    {q: "The story was a symbolic ___.", a: "C", o: ["A. affinity", "B. allege", "C. allegory", "D. acumen"]},
-    {q: "Funds were ___ to various departments.", a: "B", o: ["A. affixed", "B. allotted", "C. afflicted", "D. alluded"]},
-    {q: "The metals were combined to form an ___.", a: "A", o: ["A. alloy", "B. affiliate", "C. aggregate", "D. amnesty"]},
-    {q: "He ___ to problems without directly stating them.", a: "B", o: ["A. allured", "B. alluded", "C. alleviated", "D. accosted"]},
-    {q: "The perfume's ___ attracted many customers.", a: "B", o: ["A. affliction", "B. allure", "C. abstinence", "D. altercation"]},
-    {q: "The bird soared ___.", a: "B", o: ["A. amply", "B. aloft", "C. agape", "D. acute"]},
-    {q: "He stood ___ from the group, uninterested in the discussion.", a: "B", o: ["A. affable", "B. aloof", "C. ardent", "D. agile"]},
-    {q: "A heated ___ broke out between the two men.", a: "B", o: ["A. acquisition", "B. altercation", "C. affidavit", "D. amnesty"]},
-    {q: "Her ___ behavior surprised those who thought her selfish.", a: "B", o: ["A. affable", "B. altruistic", "C. acidic", "D. arid"]},
-    {q: "The two companies decided to ___.", a: "C", o: ["A. amass", "B. allocate", "C. amalgamate", "D. append"]},
-    {q: "He tried to ___ enough money for retirement.", a: "C", o: ["A. append", "B. agitate", "C. amass", "D. alleviate"]},
-    {q: "Her speech was clear and ___.", a: "B", o: ["A. arbitrary", "B. articulate", "C. archaic", "D. abstract"]},
-    {q: "The clever ___ helped him escape from the trap.", a: "B", o: ["A. artifact", "B. artifice", "C. acquisition", "D. appendage"]},
-  ];
+  { "q": "A secret ___ of ministers was plotting to overthrow the government.", "a": "A", "o": ["A. cabal", "B. carat", "C. cascade", "D. crater"] },
+  { "q": "The squirrel stored a ___ of nuts in a hollow tree for the winter.", "a": "C", "o": ["A. clemency", "B. chassis", "C. cache", "D. credo"] },
+  { "q": "The orchestra was known for attracting musicians of the highest ___.", "a": "B", "o": ["A. canary", "B. caliber", "C. coercion", "D. census"] },
+  { "q": "The ancient manuscript was admired for its elegant and intricate ___.", "a": "D", "o": ["A. caricature", "B. charisma", "C. calumny", "D. calligraphy"] },
+  { "q": "The politician sued the newspaper for ___, claiming the story had ruined his reputation.", "a": "A", "o": ["A. calumny", "B. clemency", "C. conviction", "D. cohesion"] },
+  { "q": "The miners took a ___ into the coal mine to detect poisonous gases.", "a": "C", "o": ["A. caricature", "B. connoisseur", "C. canary", "D. conduit"] },
+  { "q": "The politician's speech was marked by a refreshing ___ that surprised reporters.", "a": "B", "o": ["A. charisma", "B. candor", "C. collusion", "D. concession"] },
+  { "q": "Her ___ features, including a strong jaw and sharp teeth, were noticeable.", "a": "D", "o": ["A. congenial", "B. chaste", "C. carnivorous", "D. canine"] },
+  { "q": "Volunteers went door-to-door to ___ support for the local candidate.", "a": "A", "o": ["A. canvass", "B. curtail", "C. concede", "D. compel"] },
+  { "q": "The weather was notoriously ___, changing from sunny to stormy in minutes.", "a": "C", "o": ["A. contagious", "B. conspicuous", "C. capricious", "D. compliant"] },
+  { "q": "A sudden gust of wind threatened to ___ the small sailboat.", "a": "B", "o": ["A. coagulate", "B. capsize", "C. contaminate", "D. converge"] },
+  { "q": "The escaped lion was held in ___ until it could be moved to a secure reserve.", "a": "A", "o": ["A. captivity", "B. condolence", "C. compliance", "D. confluence"] },
+  { "q": "She received a beautiful one-___ diamond engagement ring.", "a": "D", "o": ["A. cabal", "B. census", "C. criterion", "D. carat"] },
+  { "q": "He packed the fragile items in a sturdy ___ box to prevent them from breaking.", "a": "B", "o": ["A. cubicle", "B. cardboard", "C. constituency", "D. chassis"] },
+  { "q": "The patient was monitored for any signs of ___ arrest after the surgery.", "a": "C", "o": ["A. celestial", "B. cerebral", "C. cardiac", "D. communal"] },
+  { "q": "The ___ rule of the team is that all players must respect their coach.", "a": "A", "o": ["A. cardinal", "B. corrosive", "C. cosmic", "D. cryptic"] },
+  { "q": "The street artist drew a humorous ___ of the mayor with exaggerated features.", "a": "B", "o": ["A. cataclysm", "B. caricature", "C. charisma", "D. calligraphy"] },
+  { "q": "He wore a red ___ pinned to his lapel for the formal event.", "a": "D", "o": ["A. carat", "B. chameleon", "C. canary", "D. carnation"] },
+  { "q": "Lions are ___ animals that primarily hunt other animals for food.", "a": "A", "o": ["A. carnivorous", "B. chaste", "C. congenital", "D. coniferous"] },
+  { "q": "A ___ of water flowed down the rocks after the heavy rain.", "a": "C", "o": ["A. cataclysm", "B. cabal", "C. cascade", "D. catalyst"] },
+  { "q": "The financial ___ of 2008 affected economies worldwide.", "a": "B", "o": ["A. catastrophe", "B. cataclysm", "C. coincidence", "D. cohesion"] },
+  { "q": "The new enzyme acted as a ___ to speed up the chemical reaction.", "a": "D", "o": ["A. counterpart", "B. connoisseur", "C. contingency", "D. catalyst"] },
+  { "q": "The earthquake was a terrible ___ that left thousands homeless.", "a": "A", "o": ["A. catastrophe", "B. coincidence", "C. coalition", "D. concession"] },
+  { "q": "The dentist found a small ___ in one of the patient's molars.", "a": "B", "o": ["A. credence", "B. cavity", "C. crevice", "D. conduit"] },
+  { "q": "The astronomer used a powerful telescope to observe ___ bodies like stars and planets.", "a": "C", "o": ["A. cerebral", "B. ceremonious", "C. celestial", "D. communal"] },
+  { "q": "The government might ___ a film if it contains overly sensitive content.", "a": "A", "o": ["A. censor", "B. compel", "C. concoct", "D. concede"] },
+  { "q": "He was a ___ critic, often finding fault in every aspect of a performance.", "a": "B", "o": ["A. compelling", "B. censorious", "C. complacent", "D. compliant"] },
+  { "q": "The committee passed a vote of ___ against its leader for misconduct.", "a": "D", "o": ["A. condolence", "B. concession", "C. clemency", "D. censure"] },
+  { "q": "The national ___ is conducted every ten years to count the population.", "a": "A", "o": ["A. census", "B. consensus", "C. conspiracy", "D. contraband"] },
+  { "q": "As a ___, she held moderate political views, avoiding extreme positions.", "a": "C", "o": ["A. chauvinist", "B. creditor", "C. centrist", "D. culprit"] },
+  { "q": "The stroke affected the ___ cortex of his brain, impacting his thought processes.", "a": "B", "o": ["A. cosmic", "B. cerebral", "C. cardiac", "D. corrosive"] },
+  { "q": "The coronation was a highly ___ event, filled with ancient rituals and traditions.", "a": "A", "o": ["A. ceremonious", "B. chaotic", "C. contagious", "D. controversial"] },
+  { "q": "Like a ___, the politician changed his position depending on the audience.", "a": "D", "o": ["A. connoisseur", "B. curator", "C. creditor", "D. chameleon"] },
+  { "q": "The scene at the market was ___ with vendors shouting and people rushing everywhere.", "a": "C", "o": ["A. compact", "B. chaste", "C. chaotic", "D. coherent"] },
+  { "q": "Her natural ___ made her a beloved and influential leader.", "a": "B", "o": ["A. calligraphy", "B. charisma", "C. calumny", "D. coercion"] },
+  { "q": "The car's ___ was badly damaged in the accident, but the engine was intact.", "a": "A", "o": ["A. chassis", "B. cache", "C. conduit", "D. cabal"] },
+  { "q": "In some cultures, it is traditional for women to remain ___ until marriage.", "a": "C", "o": ["A. complacent", "B. corrosive", "C. chaste", "D. copious"] },
+  { "q": "His blatant ___ led him to believe his country was superior to all others.", "a": "D", "o": ["A. centrist", "B. connoisseur", "C. creditor", "D. chauvinist"] },
+  { "q": "The new prime minister had a ___ past that included several political scandals.", "a": "B", "o": ["A. congenial", "B. checkered", "C. compact", "D. consecutive"] },
+  { "q": "The new regulations ___ the amount of time that doctors can work without a break.", "a": "A", "o": ["A. circumscribe", "B. commemorate", "C. collaborate", "D. coincide"] },
+  { "q": "A good detective must be ___ and notice every small detail at a crime scene.", "a": "C", "o": ["A. corrupt", "B. culpable", "C. circumspect", "D. contentious"] },
+  { "q": "The hackers found a way to ___ the school's security system.", "a": "B", "o": ["A. contaminate", "B. circumvent", "C. consolidate", "D. condone"] },
+  { "q": "The knight was ___ in shining armor, ready for battle.", "a": "D", "o": ["A. chaste", "B. clad", "C. contrite", "D. cryptic"] },
+  { "q": "The governor granted ___ to the prisoner on death row, reducing his sentence to life.", "a": "A", "o": ["A. clemency", "B. calumny", "C. coercion", "D. credibility"] },
+  { "q": "The protein in the blood began to ___ and form a clot to stop the bleeding.", "a": "C", "o": ["A. circumvent", "B. commemorate", "C. coagulate", "D. chastise"] },
+  { "q": "The small companies decided to ___ into a single, more powerful corporation.", "a": "B", "o": ["A. contend", "B. coalesce", "C. concede", "D. concur"] },
+  { "q": "He claimed he only confessed under ___, as the police had threatened him.", "a": "D", "o": ["A. confluence", "B. cohesion", "C. condolence", "D. coercion"] },
+  { "q": "The treaty was designed to promote peaceful ___ between the two nations.", "a": "A", "o": ["A. coexistence", "B. collusion", "C. cataclysm", "D. commotion"] },
+  { "q": "She presented a clear and ___ argument that was easy for the jury to follow.", "a": "B", "o": ["A. colloquial", "B. coherent", "C. compatible", "D. combustible"] },
+  { "q": "The strong ___ of the team was the key to their success.", "a": "C", "o": ["A. coercion", "B. charisma", "C. cohesion", "D. conviction"] },
+  { "q": "It was a surprise to see their birthdays ___ on the very same day.", "a": "A", "o": ["A. coincide", "B. compel", "C. contrive", "D. concoct"] },
+  { "q": "Any resemblance to real persons is purely ___.", "a": "D", "o": ["A. contentious", "B. commemorative", "C. corrosive", "D. coincidental"] },
+  { "q": "The two scientists decided to ___ on the research project.", "a": "B", "o": ["A. commemorate", "B. collaborate", "C. coagulate", "D. condescend"] },
+  { "q": "The loan was secured with the property as ___.", "a": "C", "o": ["A. cohesion", "B. constituent", "C. collateral", "D. credo"] },
+  { "q": "The documentary was a ___ effort by a group of young filmmakers.", "a": "D", "o": ["A. controversial", "B. celestial", "C. carnivorous", "D. collective"] },
+  { "q": "The book was written in a warm, ___ style that felt very conversational.", "a": "A", "o": ["A. colloquial", "B. ceremonious", "C. concentric", "D. contentious"] },
+  { "q": "The executives were accused of ___ to fix prices and deceive investors.", "a": "B", "o": ["A. cohesion", "B. collusion", "C. condolence", "D. clemency"] },
+  { "q": "Gasoline is a highly ___ material and must be handled with care.", "a": "C", "o": ["A. compatible", "B. coherent", "C. combustible", "D. communal"] },
+  { "q": "A statue was built to ___ the soldiers who died in the war.", "a": "A", "o": ["A. commemorate", "B. contaminate", "C. consolidate", "D. contravene"] },
+  { "q": "The salary offered will be ___ with the candidate's skills and experience.", "a": "B", "o": ["A. congenital", "B. commensurate", "C. consecutive", "D. compulsive"] },
+  { "q": "Finishing the marathon showed her deep ___ to her training.", "a": "D", "o": ["A. compromise", "B. constituency", "C. condolence", "D. commitment"] },
+  { "q": "The residents shared a ___ garden behind their apartment building.", "a": "C", "o": ["A. compact", "B. chaste", "C. communal", "D. copious"] },
+  { "q": "Her ___ car was easy to park in the crowded city streets.", "a": "B", "o": ["A. cumbersome", "B. compact", "C. chaotic", "D. checkered"] },
+  { "q": "This software is not ___ with your current operating system.", "a": "A", "o": ["A. compatible", "B. compelling", "C. complacent", "D. complicity"] },
+  { "q": "Financial difficulties will ___ him to sell his beloved car.", "a": "D", "o": ["A. condone", "B. concoct", "C. console", "D. compel"] },
+  { "q": "The lawyer made a ___ argument that swayed the jury.", "a": "B", "o": ["A. complacent", "B. compelling", "C. combustible", "D. contrite"] },
+  { "q": "The company will ___ you for any travel expenses you incur.", "a": "C", "o": ["A. compel", "B. consolidate", "C. compensate", "D. confiscate"] },
+  { "q": "After winning three championships, the team became ___ and stopped training hard.", "a": "A", "o": ["A. complacent", "B. compliant", "C. complicit", "D. contrite"] },
+  { "q": "The artist used color and shadow as a ___ to the main subject.", "a": "B", "o": ["A. conviction", "B. complement", "C. compromise", "D. compulsion"] },
+  { "q": "The building was not in ___ with fire safety regulations.", "a": "D", "o": ["A. condolence", "B. compulsion", "C. commitment", "D. compliance"] },
+  { "q": "His ___ in the crime was undeniable, as he had driven the getaway car.", "a": "C", "o": ["A. compliance", "B. condolence", "C. complicity", "D. constituency"] },
+  { "q": "All employees must ___ with the company's code of conduct.", "a": "A", "o": ["A. comply", "B. compel", "C. concoct", "D. console"] },
+  { "q": "She maintained her ___ despite the chaotic situation around her.", "a": "B", "o": ["A. commitment", "B. composure", "C. compromise", "D. credo"] },
+  { "q": "The detective had to ___ the different clues to solve the mystery.", "a": "D", "o": ["A. concede", "B. condone", "C. converge", "D. compound"] },
+  { "q": "In any negotiation, both sides must be willing to ___.", "a": "C", "o": ["A. compel", "B. commemorate", "C. compromise", "D. conspire"] },
+  { "q": "He felt a strong ___ to check that the doors were locked three times.", "a": "B", "o": ["A. concession", "B. compulsion", "C. contingency", "D. conviction"] },
+  { "q": "After hours of debate, the senator finally had to ___ defeat.", "a": "A", "o": ["A. concede", "B. condone", "C. compose", "D. concur"] },
+  { "q": "His ___ in his own abilities was so great that he refused to listen to advice.", "a": "C", "o": ["A. clemency", "B. consensus", "C. conceit", "D. coercion"] },
+  { "q": "The ripples spread out in ___ circles after the stone was thrown into the lake.", "a": "D", "o": ["A. congenial", "B. consecutive", "C. celestial", "D. concentric"] },
+  { "q": "The company offered a small ___ to the unhappy customer.", "a": "A", "o": ["A. concession", "B. compulsion", "C. conviction", "D. conspiracy"] },
+  { "q": "The diplomat was skilled in the art of ___, able to bring opposing sides together.", "a": "B", "o": ["A. collusion", "B. conciliation", "C. conjecture", "D. caricature"] },
+  { "q": "He tried to ___ a wild story about why he was late.", "a": "C", "o": ["A. condone", "B. compel", "C. concoct", "D. consolidate"] },
+  { "q": "The expert did not ___ with the findings of the initial report.", "a": "D", "o": ["A. concede", "B. consolidate", "C. condone", "D. concur"] },
+  { "q": "The manager would often ___ to his employees, speaking to them as if they were children.", "a": "B", "o": ["A. collaborate", "B. condescend", "C. commemorate", "D. coincide"] },
+  { "q": "We wish to express our sincere ___ to the family of the deceased.", "a": "A", "o": ["A. condolence", "B. conviction", "C. compliance", "D. coercion"] },
+  { "q": "He owns a ___ in a new high-rise building downtown.", "a": "C", "o": ["A. concession", "B. constituency", "C. condominium", "D. conduit"] },
+  { "q": "The school does not ___ bullying in any form.", "a": "B", "o": ["A. coincide", "B. condone", "C. concoct", "D. constrain"] },
+  { "q": "Metal is a ___ material, which is why it's used for electrical wires.", "a": "D", "o": ["A. corrosive", "B. cosmic", "C. combustible", "D. conductive"] },
+  { "q": "The ancient city used a stone ___ to carry fresh water from the mountains.", "a": "A", "o": ["A. conduit", "B. crater", "C. cabal", "D. conifer"] },
+  { "q": "The authorities will ___ any illegal goods found at the border.", "a": "C", "o": ["A. condone", "B. console", "C. confiscate", "D. consolidate"] },
+  { "q": "The ___ of the two rivers creates a very fertile valley.", "a": "B", "o": ["A. consignment", "B. confluence", "C. consensus", "D. contingency"] },
+  { "q": "There is a high degree of ___ in the design of their new products.", "a": "D", "o": ["A. congestion", "B. calumny", "C. contrivance", "D. conformity"] },
+  { "q": "He was a ___ host who made everyone feel welcome and comfortable.", "a": "A", "o": ["A. congenial", "B. censorious", "C. carnivorous", "D. culpable"] },
+  { "q": "The patient has a ___ heart defect, which means she was born with it.", "a": "C", "o": ["A. contagious", "B. controversial", "C. congenital", "D. counterfeit"] },
+  { "q": "The media ___ owns dozens of newspapers, television stations, and websites.", "a": "B", "o": ["A. constituency", "B. conglomeration", "C. condominium", "D. connoisseur"] },
+  { "q": "The ___ of the two triangles proved they were identical.", "a": "D", "o": ["A. contingency", "B. conjecture", "C. concession", "D. congruence"] },
+  { "q": "A pine tree is a type of ___, known for its cones.", "a": "A", "o": ["A. conifer", "B. connoisseur", "C. curator", "D. creditor"] },
+  { "q": "The forest was full of tall, ___ trees like pines and firs.", "a": "C", "o": ["A. carnivorous", "B. cardiac", "C. coniferous", "D. corrosive"] },
+  { "q": "Any statement about the future of the market is pure ___ at this point.", "a": "B", "o": ["A. conviction", "B. conjecture", "C. consensus", "D. compliance"] },
+  { "q": "He was a ___ of fine wine, with an impressive collection in his cellar.", "a": "D", "o": ["A. curator", "B. culprit", "C. constituent", "D. connoisseur"] },
+  { "q": "The word 'home' has a positive ___ of warmth and comfort.", "a": "A", "o": ["A. connotation", "B. conjecture", "C. conviction", "D. compromise"] },
+  { "q": "He followed his ___ and returned the lost wallet to its owner.", "a": "B", "o": ["A. consensus", "B. conscience", "C. constituency", "D. conspiracy"] },
+  { "q": "She held the record for scoring in five ___ games.", "a": "C", "o": ["A. copious", "B. contentious", "C. consecutive", "D. complacent"] },
+  { "q": "After a long debate, the committee finally reached a ___.", "a": "D", "o": ["A. conjecture", "B. conscience", "C. conspiracy", "D. consensus"] },
+  { "q": "She tried to ___ her friend after he failed the exam.", "a": "A", "o": ["A. console", "B. confiscate", "C. compel", "D. contend"] },
+  { "q": "The company plans to ___ its smaller branches into one large headquarters.", "a": "B", "o": ["A. contaminate", "B. consolidate", "C. commemorate", "D. contravene"] },
+  { "q": "The deep ___ of the cello blended beautifully with the violin.", "a": "C", "o": ["A. conviction", "B. consensus", "C. consonance", "D. charisma"] },
+  { "q": "The pop star was so ___ that he could not walk down the street without being noticed.", "a": "D", "o": ["A. congenial", "B. chaste", "C. cryptic", "D. conspicuous"] },
+  { "q": "The group was accused of ___ to commit fraud.", "a": "A", "o": ["A. conspiracy", "B. consensus", "C. conviction", "D. cohesion"] },
+  { "q": "The politician visited his ___ to listen to the voters' concerns.", "a": "B", "o": ["A. conglomeration", "B. constituency", "C. condominium", "D. connoisseur"] },
+  { "q": "A ___ is a voter who is represented by an elected official.", "a": "C", "o": ["A. creditor", "B. curator", "C. constituent", "D. culprit"] },
+  { "q": "The main ___ on the project is a lack of funding.", "a": "D", "o": ["A. conviction", "B. consensus", "C. condolence", "D. constraint"] },
+  { "q": "The flu is a highly ___ illness that spreads easily from person to person.", "a": "A", "o": ["A. contagious", "B. copious", "C. controversial", "D. counterfeit"] },
+  { "q": "One drop of the chemical could ___ the entire water supply.", "a": "B", "o": ["A. consolidate", "B. contaminate", "C. console", "D. commemorate"] },
+  { "q": "The museum features both historical artifacts and ___ art.", "a": "C", "o": ["A. concentric", "B. consecutive", "C. contemporary", "D. contentious"] },
+  { "q": "She looked at him with ___ after he betrayed her trust.", "a": "D", "o": ["A. composure", "B. compliance", "C. clemency", "D. contempt"] },
+  { "q": "Three teams will ___ for the championship title.", "a": "A", "o": ["A. contend", "B. condone", "C. concede", "D. concoct"] },
+  { "q": "The debate became ___ as the candidates argued over the new tax law.", "a": "B", "o": ["A. copious", "B. contentious", "C. compatible", "D. compliant"] },
+  { "q": "The team had a ___ plan in case their star player was injured.", "a": "C", "o": ["A. conviction", "B. conspiracy", "C. contingency", "D. consensus"] },
+  { "q": "The outcome of the election is ___ on the youth vote.", "a": "D", "o": ["A. conscientious", "B. contiguous", "C. complacent", "D. contingent"] },
+  { "q": "The customs officers seized a shipment of ___ goods.", "a": "A", "o": ["A. contraband", "B. collateral", "C. credentials", "D. condolence"] },
+  { "q": "To ___ the rules of the agreement would result in serious penalties.", "a": "B", "o": ["A. contaminate", "B. contravene", "C. consolidate", "D. converge"] },
+  { "q": "The defendant had a ___ expression, showing deep remorse for his actions.", "a": "C", "o": ["A. copious", "B. censorious", "C. contrite", "D. chaotic"] },
+  { "q": "Abortion remains a highly ___ topic in politics.", "a": "D", "o": ["A. consensual", "B. commemorative", "C. coincidental", "D. controversial"] },
+  { "q": "The new evidence seems to ___ the defendant's original alibi.", "a": "A", "o": ["A. controvert", "B. consolidate", "C. commemorate", "D. confiscate"] },
+  { "q": "The committee will ___ next week to discuss the budget.", "a": "B", "o": ["A. contravene", "B. convene", "C. contaminate", "D. circumvent"] },
+  { "q": "The two paths ___ at a single point just before the waterfall.", "a": "C", "o": ["A. curtail", "B. condone", "C. converge", "D. contrive"] },
+  { "q": "The artist chose to ___ his feelings through his paintings rather than words.", "a": "D", "o": ["A. confiscate", "B. concede", "C. contravene", "D. converse"] },
+  { "q": "Her ___ that the earth was flat was not supported by any evidence.", "a": "A", "o": ["A. conviction", "B. condolence", "C. concession", "D. consensus"] },
+  { "q": "The professor took ___ notes during the lecture.", "a": "B", "o": ["A. cosmic", "B. copious", "C. cryptic", "D. corrosive"] },
+  { "q": "The witness was asked to ___ the details of the defendant's story.", "a": "C", "o": ["A. contravene", "B. contaminate", "C. corroborate", "D. coerce"] },
+  { "q": "The acid was so ___ that it ate through the metal plate.", "a": "D", "o": ["A. copious", "B. communal", "C. compatible", "D. corrosive"] },
+  { "q": "The package arrived in a ___ cardboard box.", "a": "A", "o": ["A. corrugated", "B. counterfeit", "C. cryptic", "D. contentious"] },
+  { "q": "The scale of the universe is truly ___, with billions of galaxies.", "a": "B", "o": ["A. carnivorous", "B. cosmic", "C. cerebral", "D. cardiac"] },
+  { "q": "The police seized a large amount of ___ money from the criminals.", "a": "C", "o": ["A. commendable", "B. collateral", "C. counterfeit", "D. cohesive"] },
+  { "q": "The country developed a nuclear ___ to deter any potential attacks.", "a": "D", "o": ["A. conviction", "B. conspiracy", "C. contingency", "D. countermeasure"] },
+  { "q": "The foreign minister met with his ___ from Japan to discuss the trade agreement.", "a": "A", "o": ["A. counterpart", "B. connoisseur", "C. creditor", "D. constituent"] },
+  { "q": "The two tribes made a sacred ___ to always live in peace.", "a": "B", "o": ["A. confluence", "B. covenant", "C. contingency", "D. caricature"] },
+  { "q": "The construction ___ lifted the heavy steel beams into place.", "a": "C", "o": ["A. crater", "B. cache", "C. crane", "D. creed"] },
+  { "q": "The meteorite left a massive ___ in the desert.", "a": "D", "o": ["A. crevice", "B. conduit", "C. chassis", "D. crater"] },
+  { "q": "The jury gave little ___ to the witness's unreliable testimony.", "a": "A", "o": ["A. credence", "B. clemency", "C. coercion", "D. calumny"] },
+  { "q": "Reporters must show their press ___ to enter the briefing room.", "a": "B", "o": ["A. connotations", "B. credentials", "C. condolences", "D. convictions"] },
+  { "q": "The scandal damaged the politician's ___ and trustworthiness.", "a": "C", "o": ["A. charisma", "B. cohesion", "C. credibility", "D. clemency"] },
+  { "q": "The company owed a significant amount of money to its primary ___.", "a": "D", "o": ["A. culprit", "B. curator", "C. constituent", "D. creditor"] },
+  { "q": "His ___ was to always help those in need, no matter the cost.", "a": "A", "o": ["A. credo", "B. crater", "C. cabal", "D. caricature"] },
+  { "q": "The con man took advantage of the investor's ___ and naive trust.", "a": "B", "o": ["A. credence", "B. credulity", "C. credibility", "D. clemency"] },
+  { "q": "People of all faiths and ___ are welcome at the interfaith service.", "a": "C", "o": ["A. crescendos", "B. criterions", "C. creeds", "D. craters"] },
+  { "q": "The music built to a powerful ___ at the end of the symphony.", "a": "D", "o": ["A. confluence", "B. conviction", "C. conspiracy", "D. crescendo"] },
+  { "q": "The new moon appears in the sky as a thin ___.", "a": "A", "o": ["A. crescent", "B. crevice", "C. crater", "D. cohort"] },
+  { "q": "A small lizard was hiding in a ___ in the rock wall.", "a": "B", "o": ["A. crater", "B. crevice", "C. crescendo", "D. cabal"] },
+  { "q": "The ___ sunset painted the sky in shades of red and orange.", "a": "C", "o": ["A. cosmic", "B. cryptic", "C. crimson", "D. corrugated"] },
+  { "q": "The main ___ for judging the competition is originality.", "a": "D", "o": ["A. crescendo", "B. creed", "C. crater", "D. criterion"] },
+  { "q": "The spy sent a ___ message that only his agency could decode.", "a": "A", "o": ["A. cryptic", "B. cosmic", "C. corrosive", "D. crimson"] },
+  { "q": "He worked in a small ___ in a large, open-plan office.", "a": "B", "o": ["A. crater", "B. cubicle", "C. cache", "D. cabal"] },
+  { "q": "The driver was found to be ___ for the accident due to his negligence.", "a": "C", "o": ["A. circumspect", "B. congenial", "C. culpable", "D. contrite"] },
+  { "q": "The police are still searching for the ___ who stole the painting.", "a": "D", "o": ["A. creditor", "B. curator", "C. constituent", "D. culprit"] },
+  { "q": "The antique armor was beautiful but too ___ to wear.", "a": "A", "o": ["A. cumbersome", "B. compact", "C. communal", "D. compatible"] },
+  { "q": "The dragon's ___ for gold and treasure was legendary.", "a": "B", "o": ["A. composure", "B. cupidity", "C. clemency", "D. conviction"] },
+  { "q": "The museum's ___ was responsible for selecting the art for the new exhibit.", "a": "C", "o": ["A. connoisseur", "B. creditor", "C. curator", "D. censor"] },
+  { "q": "He gave the report a ___ glance before signing it.", "a": "D", "o": ["A. copious", "B. ceremonious", "C. censorious", "D. cursory"] },
+  { "q": "We had to ___ our vacation because of the bad weather.", "a": "A", "o": ["A. curtail", "B. convene", "C. commemorate", "D. compel"] }
+];
 
     const form = document.getElementById("quizForm");
     const resultDiv = document.getElementById("result");
@@ -296,7 +413,7 @@
       const previousHigh = parseInt(localStorage.getItem("highScore")) || 0;
       if (score > previousHigh) {
         localStorage.setItem("highScore", score);
-        highScoreDiv.textContent = `\ud83c\udfc6 Highest Score: ${score} / ${questions.length}`;
+        highScoreDiv.textContent = `Highest Score: ${score} / ${questions.length}`;
       }
 
       resultDiv.innerHTML = `<h3>You scored ${score} out of ${questions.length}</h3>`;
